@@ -18,6 +18,31 @@ function preload() {
   laserImg = loadImage(laser2b64);
 }
 
+
+
+/* TO DO:
+
+	- Menus:
+		- Main Menu
+		- Game Modes
+		- Pause
+	- Scoring
+		- Highest Score ()
+	- 
+	- 
+
+
+
+*/
+
+// let bg64 = "";
+
+let stars = [];
+
+function preload() {
+  // bgImg = loadImage(bg64);
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
   pos = createVector(width / 2, height / 2);
