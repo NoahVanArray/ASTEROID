@@ -4,15 +4,29 @@
 
 	- Menus:
 		- Main Menus 			Done
-		- Game Modes 			----
-		- Pause 				----
+		- Game Modes 			Ongoing
+		- Pause 					----
 	- Scoring:
 		- Highest Score ()  	----
 		- Current Score 		----
 	- Game Modes: 				----
-		- Solo					Ongoing
-		- Duo 					----
-		- PvP 	    			----
+		- Solo						Ongoing
+		- Duo 						----
+		- PvP 	    				----
+
+
+		To Code:
+			Max:
+				- timer
+				- asteroid border spawns
+				- state lives
+				- bgm
+
+			Yoe:
+				- sfx
+				- game modes
+				- blinking phase transition
+
 
 */
 
@@ -64,7 +78,7 @@ function draw() {
 		title();
 	}
 	if (pageState === "gameMode"){
-		// gameMode();
+		gameMode();
 	}
 	if (pageState === "solo"){
 		drawSolo();
@@ -97,6 +111,46 @@ function title(){
     text('press ENTER to start', width / 2, height / 1.7);
 }
 
+// le gamemode
+function gameMode(){
+	let headerHeight = 3.5;
+	let textHeight = 1.50;
+
+	let width1 = 4.3;
+	let width2 = 2;
+	let width3 = 1.3;
+
+	textAlign(CENTER);
+  	fill(55, 255, 0);
+    textFont(texts);
+	
+	// solo gamemode
+    textSize(windowWidth/44);
+    text('Solo', width / width1, height / headerHeight);
+
+    textSize(windowWidth/77);
+    text('(Press 1)\nPlay Solo.\nSurvive as long\nas you can.', width / width1, height / textHeight);
+
+	// duo gamemode
+    textSize(windowWidth/44);
+    text('Duo', width / width2, height / headerHeight);
+
+    textSize(windowWidth/77);
+    text('(Press 2)\nPlay with\nanother player.\nSurvive  longer.', width / width2, height / textHeight);
+
+    // pvp gamemode
+    textSize(windowWidth/44);
+    text('PVP', width / width3, height / headerHeight);
+
+    textSize(windowWidth/77);
+    text('(Press 3)\nPlay with an\nopponent. Shoot to kill.\nWhoever survives\nthe longest, wins.', width / width3, height / textHeight);
+
+    textSize(windowWidth/55);
+	textAlign(CENTER);
+    text('Back (esc).', width / 1.1, height / 1.05);
+
+}
+
 class Star {
 	constructor() {
 		this.x = random(width);
@@ -123,14 +177,43 @@ class Star {
 
 // onwards to game
 function keyPressed() {
+	// 13 = enter key
 	if (keyCode === 13) {
-		if (pageState === 'title') {
-			pageState = 'solo'; 
+		if (pageState === "title") {
+			pageState = "gameMode"; 
 			timer = 0;
 	    }
 	}
 
-	if (pageState === 'solo') {
+	// 27 = escape key
+	if (keyCode === 27) {
+		if (pageState === "gameMode") {
+			pageState = "title";
+	    }
+	}
+
+	//  49 = "1"
+	if (keyCode === 49) {
+		if (pageState === "gameMode") {
+			pageState = "solo";
+	    }
+	}
+
+	//  50= "2"
+	if (keyCode === 50) {
+		if (pageState === "gameMode") {
+			pageState = "duo";
+	    }
+	}
+
+	//  51 = "3"
+	if (keyCode === 51) {
+		if (pageState === "gameMode") {
+			pageState = "pvp";
+	    }
+	}
+
+	if (pageState === "solo") {
         keyPressedSolo(); 
     }
 }
