@@ -3,37 +3,46 @@
 /* TO DO:
 
 	- Menus:
-		- Main Menus 			Done
+		- Main Menus 			DONE
 		- Game Modes 			Ongoing
-		- Pause 					----
+		- Pause 				----
 	- Scoring:
 		- Highest Score ()  	----
 		- Current Score 		----
-	- Game Modes: 				----
-		- Solo						Ongoing
-		- Duo 						----
-		- PvP 	    				----
+	- Base Gameplay:
+		- Shoot 	    		DONE
+		- Movement				DONE
+		- Death					----
+		- Asteroids 	    	DONE
+	- Game Modes: 				
+		- Solo					Ongoing
+		- Duo 					----
+		- PvP 	    			----
 
 
-		To Code:
+		To Code (according to prio):
+			- Make GLOBAL Variable js file (saka na to)
+
 			Max:
-				- timer (cancel nato panget eh)
-				- asteroid border spawns (done)
-				- invincibility effect (done)
-				- state lives (wag na muna to beh, sa multiplayer naman yan sha)
 				- bgm 
+				- state lives (wag na muna to beh, sa multiplayer naman yan sha)
+				- timer (cancel nato panget eh)
 
 			Yoe:
-				- sfx
-				- game modes
+				- scoring
 				- blinking phase transition
+				- sfx
 
 
 */
 
 let pageState = "title";
 
-let stars = [];
+// vv for scoring vv 
+let gameStartTime = 0;
+let soloHigh = 0;
+let duoHigh = 0;
+let pvpHigh = 0;
 
 // fonts go here
 let headers, texts;
@@ -42,8 +51,8 @@ let orbitron = "data:application/octet-stream;base64,AAEAAAAUAQAABABAR0RFRj7VTPM
 
 
 function preload() {
+	// load all gameMode preloads here
 	preloadSolo();	
-
 
 	// load ze fonts 
 	headers = loadFont(p2p);
@@ -51,15 +60,16 @@ function preload() {
 
 }
 
-function setup() {	
+function setup() {
+	loadHighScores();	
+
+	// load all gameMode setups here
   	setupSolo();
   	createCanvas(displayWidth-140, displayHeight-140);
 
 	for (let i = 0; i < 100; i++){
 		stars.push( new Star() );
 	}
-
-  
 }
 
 function windowResized() {
@@ -75,6 +85,7 @@ function draw() {
     }
 
 	// where you curr are
+	// load all gameMode draws here
 	if (pageState === "title"){
 		title();
 	}
@@ -83,97 +94,13 @@ function draw() {
 	}
 	if (pageState === "solo"){
 		drawSolo();
-		timer = 0;
 	}
 	if (pageState === "duo"){
 		// duo();
 	}
 	if (pageState === "pvp"){
 		// pvp();
-	}
-
-  	
-}
-
-let shipAngle = 0;
-
-function title(){
-	// TITLE TEXT LEZGOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    textSize(windowWidth/16);
-	textAlign(CENTER);
-  	fill(55, 255, 0);
-    textFont(headers);
-    text('ASTEROIDS', width / 2, height / 2);
-
-    textSize(windowWidth/50);
-	textAlign(CENTER);
-  	fill(55, 255, 0);
-    textFont(texts);
-    text('press ENTER to start', width / 2, height / 1.7);
-}
-
-// le gamemode
-function gameMode(){
-	let headerHeight = 3.5;
-	let textHeight = 1.50;
-
-	let width1 = 4.3;
-	let width2 = 2;
-	let width3 = 1.3;
-
-	textAlign(CENTER);
-  	fill(55, 255, 0);
-    textFont(texts);
-	
-	// solo gamemode
-    textSize(windowWidth/44);
-    text('Solo', width / width1, height / headerHeight);
-
-    textSize(windowWidth/77);
-    text('(Press 1)\nPlay Solo.\nSurvive as long\nas you can.', width / width1, height / textHeight);
-
-	// duo gamemode
-    textSize(windowWidth/44);
-    text('Duo', width / width2, height / headerHeight);
-
-    textSize(windowWidth/77);
-    text('(Press 2)\nPlay with\nanother player.\nSurvive  longer.', width / width2, height / textHeight);
-
-    // pvp gamemode
-    textSize(windowWidth/44);
-    text('PVP', width / width3, height / headerHeight);
-
-    textSize(windowWidth/77);
-    text('(Press 3)\nPlay with an\nopponent. Shoot to kill.\nWhoever survives\nthe longest, wins.', width / width3, height / textHeight);
-
-    textSize(windowWidth/55);
-	textAlign(CENTER);
-    text('Back (esc).', width / 1.1, height / 1.05);
-
-}
-
-class Star {
-	constructor() {
-		this.x = random(width);
-		this.y = random(height);
-		this.size = random(1,5);
-		this.speed = random(1,3);
-	}
-
-	show() {
-		noStroke();
-		fill(244);
-		ellipse(this.x, this.y, this.size);
-	}
-
-	update() {
-		this.x -= this.speed;
-
-		if (this.x < this.size) {
-			this.x = width + this.size;
-			this.y = random(height);
-		}
-	}
+	} 	
 }
 
 // onwards to game
@@ -197,6 +124,7 @@ function keyPressed() {
 	if (keyCode === 49) {
 		if (pageState === "gameMode") {
 			pageState = "solo";
+			gameStartTime = millis();
 	    }
 	}
 

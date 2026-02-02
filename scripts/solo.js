@@ -56,17 +56,18 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-let timer = 0;
+let timer;
 
 function drawSolo() {
-	timer = floor(millis()/1000)
+	let currentSessionTime = millis() - gameStartTime;
+    timer = floor(currentSessionTime / 1000);
 	textSize(windowWidth/16);
 	textAlign(CENTER);
-  noFill();
-  stroke(250);
-  strokeWeight(3);
-  textFont(headers);
-  text(timer, width / 2, height / 2);
+  	noFill();
+  	stroke(250);
+  	strokeWeight(3);
+  	textFont(headers);
+  	text(timer, width / 2, height / 2);
 
   // ship location logic
   ship.update();
@@ -147,12 +148,14 @@ function splitAsteroid(asteroid) {
 }
 
 function checkShipAsteroidCollision() {
-  if (shipInvincible) {
-    if (millis() - shipInvincibleTime > INVINCIBILITY_DURATION) {
-      shipInvincible = false;
-    }
-    return;
-  }
+	updateHighScore('solo', timer);
+
+  	if (shipInvincible) {
+    	if (millis() - shipInvincibleTime > INVINCIBILITY_DURATION) {
+      	shipInvincible = false;
+    	}
+    	return;
+  	}
 
   for (let asteroid of asteroids) {
     let d = dist(
