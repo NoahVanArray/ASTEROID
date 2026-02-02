@@ -17,10 +17,11 @@
 
 		To Code:
 			Max:
-				- timer
-				- asteroid border spawns
-				- state lives
-				- bgm
+				- timer (cancel nato panget eh)
+				- asteroid border spawns (done)
+				- invincibility effect (done)
+				- state lives (wag na muna to beh, sa multiplayer naman yan sha)
+				- bgm 
 
 			Yoe:
 				- sfx
