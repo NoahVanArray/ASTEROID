@@ -38,8 +38,8 @@ function gameMode(){
 
     fill(255, 200, 0); 
     textSize(18);
-    text(`SOLO BEST: \n${highScores.solo}`, width / width1, height - 150);
-    text(`DUO BEST: \n${highScores.duo}`, width / width2, height - 150);
-    text(`PVP BEST: \n${highScores.pvp}`, width / width3, height - 150);
+    text(`SOLO BEST: \n${highScores.solo}`, width / width1, height - textHeight*77);
+    text(`DUO BEST: \n${highScores.duo}`, width / width2, height - textHeight*77);
+    text(`PVP BEST: \n${highScores.pvp}`, width / width3, height - textHeight*77); // not needed
 
 }

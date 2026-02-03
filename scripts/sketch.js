@@ -65,7 +65,7 @@ function setup() {
 
 	// load all gameMode setups here
   	setupSolo();
-  	createCanvas(displayWidth-140, displayHeight-140);
+  	createCanvas(displayWidth*0.99, displayHeight*0.83);
 
 	for (let i = 0; i < 100; i++){
 		stars.push( new Star() );
@@ -87,7 +87,7 @@ function draw() {
 	// where you curr are
 	// load all gameMode draws here
 	if (pageState === "title"){
-		title();
+		 title();
 	}
 	if (pageState === "gameMode"){
 		gameMode();
@@ -102,6 +102,7 @@ function draw() {
 		// pvp();
 	} 	
 }
+
 
 // onwards to game
 function keyPressed() {

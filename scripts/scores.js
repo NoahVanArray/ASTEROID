@@ -1,7 +1,7 @@
 let highScores = {
     solo: 0,
     duo: 0,
-    pvp: 0
+    pvp: 0 // not needed
 };
 
 function loadHighScores() {
