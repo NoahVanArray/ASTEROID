@@ -1,4 +1,6 @@
 
+let over = false;
+
 let lasers = [];
 let asteroids = [];
 
@@ -166,7 +168,10 @@ function checkShipAsteroidCollision() {
     );
 
     if (d < asteroid.r + ship.size / 2) {
-      ship.respawn();
+      
+      over = true;
+      timer = timer;
+      // ship.respawn();
       break;
     }
   }
@@ -329,4 +334,27 @@ class Asteroid {
     image(img, 0, 0, this.r * 2, this.r * 2);
     pop();
   }
+}
+
+// for the gameOver
+function resetSolo() {
+    // 1. Clear the arrays completely
+    asteroids = [];
+    lasers = [];
+
+    // 2. Reset the ship to the center and stop its movement
+    ship = new Ship();
+    ship.pos = createVector(width / 2, height / 2);
+    ship.vel.set(0, 0);
+
+    // 3. Reset the timer logic
+    gameStartTime = millis();
+
+    // 4. Re-spawn the initial asteroids
+    spawnAsteroids(60, 5);  // large
+    spawnAsteroids(40, 8);  // medium
+    spawnAsteroids(20, 10); // small
+    
+    // 5. Turn off the Game Over flag
+    over = false;
 }

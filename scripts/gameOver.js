@@ -1,6 +1,16 @@
+// le game, le over 
+
+/* REMINDERS:
+        + When doing a gameOver, pls:
+             - Get and restart the score/highScore
+             - Restart game states (solo, duo, pvp)
+             - Restart game assets (asteroids, spacechips)
+*/ 
+
 function gameOver(){
-    // TITLE TEXT LEZGOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-        textSize(windowWidth/16);
+    noStroke();
+    
+    textSize(windowWidth/16);
     textAlign(CENTER);
     fill(240, 80, 50);
         textFont(headers);

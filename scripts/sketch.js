@@ -4,20 +4,20 @@
 
 	- Menus:
 		- Main Menus 			DONE
-		- Game Modes 			Ongoing
+		- Game Modes 			toBeContinued
 		- Pause 				----
 	- Scoring:
-		- Highest Score ()  	----
-		- Current Score 		----
+		- Highest Score ()  	DONE
+		- Current Score 		DONE
 	- Base Gameplay:
-		- Shoot 	    		DONE
-		- Movement				DONE
-		- Death					----
-		- Asteroids 	    	DONE
+		- Shoot 	    			DONE
+		- Movement			DONE
+		- Death					Ongoing
+		- Asteroids 	    		DONE
 	- Game Modes: 				
 		- Solo					Ongoing
 		- Duo 					----
-		- PvP 	    			----
+		- PvP 	    				----
 
 
 		To Code (according to prio):
@@ -25,11 +25,8 @@
 
 			Max:
 				- bgm 
-				- state lives (wag na muna to beh, sa multiplayer naman yan sha)
-				- timer (cancel nato panget eh)
-
+				
 			Yoe:
-				- scoring
 				- blinking phase transition
 				- sfx
 
@@ -89,18 +86,21 @@ function draw() {
 	if (pageState === "title"){
 		 title();
 	}
-	if (pageState === "gameMode"){
+	else if (pageState === "gameMode"){
 		gameMode();
 	}
-	if (pageState === "solo"){
+	else if (pageState === "solo"){
 		drawSolo();
 	}
-	if (pageState === "duo"){
+	else if (pageState === "duo"){
 		// duo();
 	}
-	if (pageState === "pvp"){
+	else if (pageState === "pvp"){
 		// pvp();
 	} 	
+	else if (over === true){
+		gameOver();
+	}
 }
 
 
@@ -119,13 +119,19 @@ function keyPressed() {
 		if (pageState === "gameMode") {
 			pageState = "title";
 	    }
+	    if (pageState === "solo") {
+			pageState = "gameMode";
+			over = false;
+	    }
 	}
 
 	//  49 = "1"
 	if (keyCode === 49) {
 		if (pageState === "gameMode") {
+			resetSolo();
 			pageState = "solo";
 			gameStartTime = millis();
+			over = false
 	    }
 	}
 
@@ -140,6 +146,14 @@ function keyPressed() {
 	if (keyCode === 51) {
 		if (pageState === "gameMode") {
 			pageState = "pvp";
+	    }
+	}
+
+	//  82 = "R"
+	if (keyCode === 82) {
+		if (pageState === "gameOver") {
+			resetSolo();
+			pageState = "solo";
 	    }
 	}
 
