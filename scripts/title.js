@@ -5,12 +5,12 @@ function title(){
 	// TITLE TEXT LEZGOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
     textSize(windowWidth/16);
 	textAlign(CENTER);
-  	fill(55, 255, 0);
+  	fill(greenColor);
     textFont(headers);
     text('ASTEROIDS', width / 2, height / 2);
 
     textSize(windowWidth/50);
-  	fill(255, 200, 0);
+  	fill(goldColor);
     textFont(texts);
     text('press ENTER to start', width / 2, height / 1.7);
 
@@ -25,7 +25,7 @@ function title(){
             if (resetHighScore > 0) {
                 textSize(windowWidth / 60);
                 textFont(texts);
-                fill(255, 50, 50, resetHighScore * 7); // fades the thing, nice fx
+                fill(255, 50, 50, resetHighScore * 7); // fades the thing, nice fx // also, on stuff like this, better to declare the rbg code directly
                 text('HIGH SCORES WIPED!', width / 2, height / 1.1);
                 
                 resetHighScore--;
@@ -36,14 +36,10 @@ function title(){
     if (stage === 2){
         isHSReset = false;
         textSize(windowWidth/70);
-        fill(255, 50, 50);
+        fill(redColor);
         textFont(texts);
         text('are you sure? Y/N', width / 2, height / 1.2);
     }
 
     
 }
-
-// gold colors
-// 255 30 30
-// 240 50 50

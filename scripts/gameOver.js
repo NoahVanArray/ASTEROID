@@ -12,26 +12,26 @@ function gameOver(){
     
     textSize(windowWidth/16);
     textAlign(CENTER);
-    fill(247, 70, 39);
+    fill(overColor);
     textFont(headers);
     text('GAME OVER', width / 2, height / 2.22);
 
     textSize(windowWidth/55);
-    fill(255, 200, 0);
+    fill(goldColor);
     textFont(texts);
     text('HIGHEST SCORE: ' + highScores.solo, width / 2, height / 1.9);
 
     textSize(windowWidth/55);
-    fill(255, 200, 0);
+    fill(goldColor);
     textFont(texts);
     text('Your Score: ' + timer, width / 2, height / 1.7);
 
     textSize(windowWidth/55);
-    fill(55, 255, 0);
+    fill(greenColor);
     textFont(texts);
     text('try again? (press r)', width / 2, height / 1.46);
 
     textSize(windowWidth/55);
-    fill(247, 70, 39);
+    fill(redColor);
     text('exit (esc)', width / 2, height / 1.3);
 }
