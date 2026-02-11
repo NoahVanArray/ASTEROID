@@ -1,5 +1,6 @@
 
 let over = false;
+let timer;
 
 let lasers = [];
 let asteroids = [];
@@ -58,18 +59,24 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
-let timer;
 
 function drawSolo() {
-	let currentSessionTime = millis() - gameStartTime;
-    timer = floor(currentSessionTime / 1000);
-	textSize(windowWidth/16);
-	textAlign(CENTER);
-  	noFill();
-  	stroke(250);
-  	strokeWeight(3);
-  	textFont(headers);
-  	text(timer, width / 2, height / 2);
+
+	if (over === true){
+
+
+	}
+	else{
+		let currentSessionTime = millis() - gameStartTime;
+	    timer = floor(currentSessionTime / 1000);
+		textSize(windowWidth/16);
+		textAlign(CENTER);
+	  	noFill();
+	  	stroke(250);
+	  	strokeWeight(3);
+	  	textFont(headers);
+	  	text(timer, width / 2, height / 2);
+	}
 
   // ship location logic
   ship.update();
@@ -209,15 +216,16 @@ class Ship {
 
   update() {
     // rotate
-    if (keyIsDown(65)) this.angle -= 0.08; // A
-    if (keyIsDown(68)) this.angle += 0.08; // D
-
-    // thrust
-    this.isThrusting = keyIsDown(87); // W
-    if (this.isThrusting) {
-      let force = p5.Vector.fromAngle(this.angle);
-      force.mult(0.2);
-      this.vel.add(force);
+    if (over === false){
+        if (keyIsDown(65)) this.angle -= 0.08; // A
+        if (keyIsDown(68)) this.angle += 0.08; // D
+	    // thrust
+	    this.isThrusting = keyIsDown(87); // W
+	    if (this.isThrusting) {
+	      let force = p5.Vector.fromAngle(this.angle);
+	      force.mult(0.2);
+	      this.vel.add(force);
+	    }
     }
 
     // physics (anueraw????? eme HAHAHAHHA)
@@ -238,7 +246,7 @@ class Ship {
     }
   }
 
-  let currentImg = this.isThrusting ? thrust1Img : ship1Img;
+  let currentImg = this.isThrusting ? (over ? ship1Img : thrust1Img): ship1Img;
   push();
     translate(this.pos.x, this.pos.y);
     rotate(this.angle + HALF_PI);
@@ -338,23 +346,21 @@ class Asteroid {
 
 // for the gameOver
 function resetSolo() {
-    // 1. Clear the arrays completely
+
     asteroids = [];
     lasers = [];
 
-    // 2. Reset the ship to the center and stop its movement
     ship = new Ship();
     ship.pos = createVector(width / 2, height / 2);
     ship.vel.set(0, 0);
 
-    // 3. Reset the timer logic
+    // reset timer
     gameStartTime = millis();
+    timer = 0;
 
-    // 4. Re-spawn the initial asteroids
     spawnAsteroids(60, 5);  // large
     spawnAsteroids(40, 8);  // medium
     spawnAsteroids(20, 10); // small
     
-    // 5. Turn off the Game Over flag
     over = false;
 }

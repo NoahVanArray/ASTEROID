@@ -1,7 +1,9 @@
 // le gamemode
 function gameMode(){
-	let headerHeight = 4.5;
-	let textHeight = 1.70;
+    // loadHighScores();
+	let headerHeight = 3.9;
+	let textHeight = 1.55;
+    let scoreHeight = 6;
 
 	let width1 = 4.3;
 	let width2 = 2;
@@ -32,14 +34,15 @@ function gameMode(){
     textSize(windowWidth/77);
     text('(Press 3)\nPlay with an\nopponent. Shoot to kill.\nWhoever survives\nthe longest, wins.', width / width3, height / textHeight);
 
+    fill(255, 200, 0); 
+    textSize(windowWidth/77);
+    text(`BEST: \n${highScores.solo}`, width / width1 + 2.5, height / scoreHeight);
+    text(`BEST: \n${highScores.duo}`, width / width2 + 2.5, height / scoreHeight);
+    text(`BEST: \n${highScores.pvp}`, width / width3 + 2.5, height / scoreHeight); // not needed
+    
     textSize(windowWidth/55);
-	textAlign(CENTER);
+	textAlign(RIGHT);
     text('Back (esc).', width / 1.1, height / 1.05);
 
-    fill(255, 200, 0); 
-    textSize(18);
-    text(`SOLO BEST: \n${highScores.solo}`, width / width1, height - textHeight*77);
-    text(`DUO BEST: \n${highScores.duo}`, width / width2, height - textHeight*77);
-    text(`PVP BEST: \n${highScores.pvp}`, width / width3, height - textHeight*77); // not needed
 
 }

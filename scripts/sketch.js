@@ -35,6 +35,9 @@
 
 let pageState = "title";
 
+// text visibility timer for notifying user that high score is reset'd
+let resetHighScore = 0;
+
 // vv for scoring vv 
 let gameStartTime = 0;
 let soloHigh = 0;
@@ -98,13 +101,25 @@ function draw() {
 	else if (pageState === "pvp"){
 		// pvp();
 	} 	
-	else if (over === true){
+	// REMINDER: over/gameOver IS NOT a state, bruh
+	if (over === true){
 		gameOver();
 	}
 }
 
+function resetAllHighScores() {
+    highScores.solo = 0;
+    highScores.duo = 0;
+    highScores.pvp = 0;
 
-// onwards to game
+    removeItem('soloHigh');
+    removeItem('duoHigh');
+    removeItem('pvpHigh');
+
+    console.log("High Scores have been reset!");
+}
+
+// handles ALL actions when a key is pressed
 function keyPressed() {
 	// 13 = enter key
 	if (keyCode === 13) {
@@ -130,8 +145,6 @@ function keyPressed() {
 		if (pageState === "gameMode") {
 			resetSolo();
 			pageState = "solo";
-			gameStartTime = millis();
-			over = false
 	    }
 	}
 
@@ -149,12 +162,33 @@ function keyPressed() {
 	    }
 	}
 
-	//  82 = "R"
+	//  78 = "N" key
+	if (keyCode === 78) {
+		if (pageState === "title") {
+			stage = 1;
+		}
+	}
+
+	//  82 = "R" key
 	if (keyCode === 82) {
-		if (pageState === "gameOver") {
+		if (over === true) {
 			resetSolo();
 			pageState = "solo";
 	    }
+		if (pageState === "title") {
+			stage = 2;
+			// resetAllHighScores();
+		}
+	}
+
+	//  89 = "Y" key
+	if (keyCode === 89) {
+		if (pageState === "title" && stage === 2) {
+			resetHighScore = 120;
+			stage = 1;
+			isHSReset = true;
+	    	resetAllHighScores();
+		}
 	}
 
 	if (pageState === "solo") {
