@@ -53,6 +53,7 @@ let orbitron = "data:application/octet-stream;base64,AAEAAAAUAQAABABAR0RFRj7VTPM
 function preload() {
 	// load all gameMode preloads here
 	preloadSolo();	
+	preloadGameMode();
 
 	// load ze fonts 
 	headers = loadFont(p2p);
