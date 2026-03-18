@@ -36,7 +36,14 @@ function drawSolo() {
 	}
 	else{
 		let currentSessionTime = millis() - gameStartTime;
-	    timer = floor(currentSessionTime / 1000);
+    timer = floor(currentSessionTime / 1000);
+    // increasing difficulty f asteroids (request for finals)
+    if (timer > 0 && timer % 30 === 0 && timer !== lastDifficultyIncreaseTime) {
+      spawnAsteroids(20, 10)
+      spawnAsteroids(60, 2); // large aster
+      spawnAsteroids(40, 3); // medium ones
+      lastDifficultyIncreaseTime = timer; 
+    }
 		textSize(windowWidth/16);
 		textAlign(CENTER);
 	  	noFill();
@@ -88,15 +95,43 @@ function drawSolo() {
     }
   }
 
+  // POWERUPs (addition for finals)
+  if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
+    powerups.push(new PowerupAsteroid());
+    powerupSpawnTracker = timer;
+  }
+  for (let p of powerups) {
+    p.update();
+    p.display();
+  }
+  for (let i = lasers.length - 1; i >= 0; i--) {
+    for (let j = powerups.length - 1; j >= 0; j--) {
+      let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
+      if (d < powerups[j].r) {
+        activatePowerup(); // Trigger the random skill!
+        powerups.splice(j, 1);
+        lasers.splice(i, 1);
+        break;
+      }
+    }
+  }
+
   checkLargeAsteroidRespawn();
   checkShipAsteroidCollision();
 }
 
 function keyPressedSolo() {
   if (keyCode === SHIFT) {
-  	if (!over){
-  	    lasers.push(ship.fire());
-  	}
+    if (!over) {
+      // checking sa skill 3 if activated pa or di pa sha naubusan ng oras gamitin
+      if (multiShotActive && millis() < multiShotEndTime) {
+        lasers.push(new Laser(ship.pos, ship.angle));        // center
+        lasers.push(new Laser(ship.pos, ship.angle - 0.2));  // left
+        lasers.push(new Laser(ship.pos, ship.angle + 0.2));  // right
+      } else {
+        lasers.push(ship.fire()); // normal laser
+      }
+    }
   }
 }
 
@@ -130,8 +165,9 @@ function checkShipAsteroidCollision() {
 	updateHighScore('solo', timer);
 
   	if (shipInvincible) {
-    	if (millis() - shipInvincibleTime > INVINCIBILITY_DURATION) {
+    	if (millis() - shipInvincibleTime > currentInvincDuration) {
       	shipInvincible = false;
+        currentInvincDuration = 3000;
     	}
     	return;
   	}
@@ -314,11 +350,41 @@ class Asteroid {
   }
 }
 
+class PowerupAsteroid {
+  constructor() {
+    this.pos = createVector(random(width), -30);
+    this.r = 25;
+    this.vel = p5.Vector.random2D().mult(2);
+  }
+  update() {
+    this.pos.add(this.vel);
+    if (this.pos.x > width + this.r) this.pos.x = -this.r;
+    if (this.pos.x < -this.r) this.pos.x = width + this.r;
+    if (this.pos.y > height + this.r) this.pos.y = -this.r;
+    if (this.pos.y < -this.r) this.pos.y = height + this.r;
+  }
+
+  // random shape muna kasi ala pa aq asset nagagawa
+  display() {
+    push();
+    fill(255, 215, 0);
+    noStroke();
+    circle(this.pos.x, this.pos.y, this.r * 2);
+    pop();
+  }
+}
+
 // for the gameOver
 function resetSolo() {
 
     asteroids = [];
     lasers = [];
+
+    powerups = [];
+    multiShotActive = false;
+    multiShotEndTime = 0;
+    powerupSpawnTracker = 0;
+    currentInvincDuration = 3000;
 
     ship = new Ship();
     ship.pos = createVector(width / 2, height / 2);
@@ -332,5 +398,24 @@ function resetSolo() {
     spawnAsteroids(40, 8);  // medium
     spawnAsteroids(20, 10); // small
     
+    lastDifficultyIncreaseTime = 0;
     over = false;
+}
+
+function activatePowerup() {
+  let roll = floor(random(3));
+  
+  if (roll === 0) {
+    // skill 1: invincibility 20 sec
+    shipInvincible = true;
+    shipInvincibleTime = millis();
+    currentInvincDuration = 20000; 
+  } else if (roll === 1) {
+    // skill 2L timer jump for 10sec
+    gameStartTime -= 10000; 
+  } else if (roll === 2) {
+    // skill 3: burst laser
+    multiShotActive = true;
+    multiShotEndTime = millis() + 15000;
+  }
 }

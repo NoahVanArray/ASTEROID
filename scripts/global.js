@@ -22,6 +22,14 @@
 	let over = false;
 	let timer;
 
+	// new addition for finals hehe (aq nauna gumawa kay yoe bleh)
+	let lastDifficultyIncreaseTime = 0;
+	let powerups = [];
+	let multiShotActive = false;
+	let multiShotEndTime = 0;
+	let powerupSpawnTracker = 0;
+	let currentInvincDuration = 3000;
+
 	let lasers = [];
 	let asteroids = [];
 
