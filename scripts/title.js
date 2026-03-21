@@ -9,11 +9,12 @@ function title(){
     textFont(headers);
     text('ASTEROIDS', width / 2, height / 2);
 
-    textSize(windowWidth/50);
-  	fill(goldColor);
-    textFont(texts);
-    text('press ENTER to start', width / 2, height / 1.7);
-
+    if (frameCount % 65 < 30) {
+        textSize(windowWidth/50);
+      	fill(goldColor);
+        textFont(texts);
+        text('press ENTER to start', width / 2, height / 1.7);
+    }
 
     if (stage === 1){
         textSize(windowWidth/70);

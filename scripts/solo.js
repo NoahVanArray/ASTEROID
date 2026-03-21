@@ -12,7 +12,6 @@ function preloadSolo() {
 }
 
 function setupSolo() {
-  createCanvas(windowWidth, windowHeight);
   
   // ship default spawn
   ship = new Ship();
@@ -23,116 +22,119 @@ function setupSolo() {
   spawnAsteroids(20, 10); // small
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
 
 function drawSolo() {
+    if (over === true) {
+        displayAllSolo(); // Keep the graveyard visible
+        // You can add your Game Over text here later
+    } 
+    else if (!started) {
+        // --- READY SCREEN ---
+        displayAllSolo(); // Show ship/asteroids frozen in place
+        drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
+    } 
+    else if (paused) {
+        // --- PAUSE SCREEN ---
+        displayAllSolo(); 
+        drawOverlay("PAUSED", "Press P to Resume", false);
+    } 
+    else {
+        // --- ACTIVE GAMEPLAY ---
+        
+        // 1. Timer Calculation (Subtracting time spent paused)
+        let currentSessionTime = millis() - gameStartTime - pausedTime;
+        timer = floor(currentSessionTime / 1000);
 
-	if (over === true){
+        // 2. Difficulty Scaling (Your logic)
+        if (timer > 0 && timer % 30 === 0 && timer !== lastDifficultyIncreaseTime) {
+            spawnAsteroids(20, 10);
+            spawnAsteroids(60, 2); 
+            spawnAsteroids(40, 3); 
+            lastDifficultyIncreaseTime = timer; 
+        }
 
+        // 3. Update & Display Everything
+        updateAllSolo();
+        displayAllSolo();
 
-	}
-	else{
-		let currentSessionTime = millis() - gameStartTime;
-    timer = floor(currentSessionTime / 1000);
-    // increasing difficulty f asteroids (request for finals)
-    if (timer > 0 && timer % 30 === 0 && timer !== lastDifficultyIncreaseTime) {
-      spawnAsteroids(20, 10)
-      spawnAsteroids(60, 2); // large aster
-      spawnAsteroids(40, 3); // medium ones
-      lastDifficultyIncreaseTime = timer; 
+        // 4. Draw the Timer UI (Your specific style)
+        textSize(displayWidth / 110);
+        textAlign(LEFT, TOP);
+        noStroke();
+        strokeWeight(3);
+        fill('#000000');
+        text("Score: " + timer, 33, 33);
+        fill('#39FF14');
+        textFont(headers);
+        text("Score: " + timer, 30, 30);
     }
-		textSize(windowWidth/16);
-		textAlign(CENTER);
-	  	noFill();
-	  	stroke(250);
-	  	strokeWeight(3);
-	  	textFont(headers);
-	  	text(timer, width / 2, height / 2);
-	}
 
-  // ship location logic
-  ship.update();
-  ship.display();
-
-  // lazer logic
-  for (let i = lasers.length - 1; i >= 0; i--) {
-    lasers[i].update();
-    lasers[i].display();
-    
-    if (lasers[i].offScreen()) {
-      lasers.splice(i, 1);
-    }
-  }
-
-  // asteroid logic
-  for (let asteroid of asteroids) {
-    asteroid.update();
-    asteroid.display();
-  }
-
-  // laser–asteroid collision
-  for (let i = lasers.length - 1; i >= 0; i--) {
-    for (let j = asteroids.length - 1; j >= 0; j--) {
-      let d = dist(
-        lasers[i].pos.x,
-        lasers[i].pos.y,
-        asteroids[j].pos.x,
-        asteroids[j].pos.y
-      );
-
-      if (d < asteroids[j].r) {
-        // split asteroid
-        splitAsteroid(asteroids[j]);
-
-        // remove hit asteroid & laser
-        asteroids.splice(j, 1);
-        lasers.splice(i, 1);
-        break;
-      }
-    }
-  }
-
-  // POWERUPs (addition for finals)
-  if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
-    powerups.push(new PowerupAsteroid());
-    powerupSpawnTracker = timer;
-  }
-  for (let p of powerups) {
-    p.update();
-    p.display();
-  }
-  for (let i = lasers.length - 1; i >= 0; i--) {
-    for (let j = powerups.length - 1; j >= 0; j--) {
-      let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
-      if (d < powerups[j].r) {
-        activatePowerup(); // Trigger the random skill!
-        powerups.splice(j, 1);
-        lasers.splice(i, 1);
-        break;
-      }
-    }
-  }
-
-  checkLargeAsteroidRespawn();
-  checkShipAsteroidCollision();
 }
 
-function keyPressedSolo() {
-  if (keyCode === SHIFT) {
-    if (!over) {
-      // checking sa skill 3 if activated pa or di pa sha naubusan ng oras gamitin
-      if (multiShotActive && millis() < multiShotEndTime) {
-        lasers.push(new Laser(ship.pos, ship.angle));        // center
-        lasers.push(new Laser(ship.pos, ship.angle - 0.2));  // left
-        lasers.push(new Laser(ship.pos, ship.angle + 0.2));  // right
-      } else {
-        lasers.push(ship.fire()); // normal laser
-      }
+function updateAllSolo() {
+    // Ship
+    ship.update();
+
+    // Lasers
+    for (let i = lasers.length - 1; i >= 0; i--) {
+        lasers[i].update();
+        if (lasers[i].offScreen()) lasers.splice(i, 1);
     }
-  }
+
+    // Asteroids
+    for (let asteroid of asteroids) {
+        asteroid.update();
+    }
+
+    // Powerups (Finals addition)
+    if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
+        powerups.push(new PowerupAsteroid());
+        powerupSpawnTracker = timer;
+    }
+    for (let p of powerups) {
+        p.update();
+    }
+
+    // --- ALL COLLISION LOGIC ---
+    handleCollisions(); 
+
+    checkLargeAsteroidRespawn();
+    checkShipAsteroidCollision();
+}
+
+function displayAllSolo() {
+    ship.display();
+    for (let l of lasers) l.display();
+    for (let a of asteroids) a.display();
+    for (let p of powerups) p.display();
+}
+
+function handleCollisions() {
+    // Laser vs Asteroid
+    for (let i = lasers.length - 1; i >= 0; i--) {
+        for (let j = asteroids.length - 1; j >= 0; j--) {
+            let d = dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y);
+            if (d < asteroids[j].r) {
+                splitAsteroid(asteroids[j]);
+                asteroids.splice(j, 1);
+                lasers.splice(i, 1);
+                break; 
+            }
+        }
+    }
+
+    // Laser vs Powerup
+    for (let i = lasers.length - 1; i >= 0; i--) {
+        for (let j = powerups.length - 1; j >= 0; j--) {
+            let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
+            if (d < powerups[j].r) {
+                activatePowerup(); 
+                powerups.splice(j, 1);
+                lasers.splice(i, 1);
+                break;
+            }
+        }
+    }
 }
 
 function spawnAsteroids(size, count) {
@@ -374,34 +376,6 @@ class PowerupAsteroid {
   }
 }
 
-// for the gameOver
-function resetSolo() {
-
-    asteroids = [];
-    lasers = [];
-
-    powerups = [];
-    multiShotActive = false;
-    multiShotEndTime = 0;
-    powerupSpawnTracker = 0;
-    currentInvincDuration = 3000;
-
-    ship = new Ship();
-    ship.pos = createVector(width / 2, height / 2);
-    ship.vel.set(0, 0);
-
-    // reset timer
-    gameStartTime = millis();
-    timer = 0;
-
-    spawnAsteroids(60, 5);  // large
-    spawnAsteroids(40, 8);  // medium
-    spawnAsteroids(20, 10); // small
-    
-    lastDifficultyIncreaseTime = 0;
-    over = false;
-}
-
 function activatePowerup() {
   let roll = floor(random(3));
   
@@ -418,4 +392,70 @@ function activatePowerup() {
     multiShotActive = true;
     multiShotEndTime = millis() + 15000;
   }
+}
+
+// for the gameOver
+function resetSolo() {
+
+  started = false;
+  paused = false;
+
+  over = false;
+  
+  asteroids = [];
+  lasers = [];
+
+  powerups = [];
+  multiShotActive = false;
+  multiShotEndTime = 0;
+  powerupSpawnTracker = 0;
+  currentInvincDuration = 3000;
+
+  ship = new Ship();
+  ship.pos = createVector(width / 2, height / 2);
+  ship.vel.set(0, 0);
+
+  // reset timer
+  timer = 0;
+  pausedTime = 0;
+  spawnAsteroids(60, 5);  // large
+  spawnAsteroids(40, 8);  // medium
+  spawnAsteroids(20, 10); // small
+  
+  lastDifficultyIncreaseTime = 0;
+  
+}
+
+// controls for solo 
+function handleSoloControls() {
+    // --- 1. START TRIGGER (Enter) ---
+    if (!started && keyCode === ENTER) {
+        started = true;
+        gameStartTime = millis();
+        pausedTime = 0;
+        return; // Exit so we don't accidentally shoot on the same frame
+    }
+
+    // --- 2. PAUSE TRIGGER (P) ---
+    if (started && !over && (keyCode === 80 || key.toLowerCase() === 'p')) {
+        paused = !paused;
+        if (paused) {
+            pauseStartTime = millis();
+        } else {
+            pausedTime += (millis() - pauseStartTime);
+        }
+    }
+
+    // --- 3. SHOOTING & POWERUPS (Shift) ---
+    // We only shoot if the game is started, NOT paused, and NOT over
+    if (started && !paused && !over && keyCode === SHIFT) {
+        // Checking for the Skill 3 (Burst Fire) Powerup
+        if (multiShotActive && millis() < multiShotEndTime) {
+            lasers.push(new Laser(ship.pos, ship.angle));        // Center
+            lasers.push(new Laser(ship.pos, ship.angle - 0.2));  // Left
+            lasers.push(new Laser(ship.pos, ship.angle + 0.2));  // Right
+        } else {
+            lasers.push(ship.fire()); // Normal single laser
+        }
+    }
 }

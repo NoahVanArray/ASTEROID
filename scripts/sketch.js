@@ -5,19 +5,20 @@
 	- Menus:
 		- Main Menus 			DONE
 		- Game Modes 			toBeContinued
-		- Pause 				----
+		- Pause 				Ongoing
 	- Scoring:
-		- Highest Score ()  	DONE
+		- Highest Score 	  	DONE
 		- Current Score 		DONE
 	- Base Gameplay:
-		- Shoot 	    			DONE
-		- Movement			DONE
+		- Shoot 	    		DONE
+		- Movement				DONE
 		- Death					Ongoing
-		- Asteroids 	    		DONE
+		- Asteroids 	    	DONE
+		- Powerups				Ongoing
 	- Game Modes: 				
 		- Solo					Ongoing
 		- Duo 					----
-		- PvP 	    				----
+		- PvP 	    			----
 
 
 		To Code (according to prio):
@@ -41,8 +42,6 @@ function preload() {
 	preloadSolo();	
 	preloadGameMode();
 
-	
-
 }
 
 function setup() {
@@ -50,15 +49,12 @@ function setup() {
 	setupGlobal();
 	// load all gameMode setups here
   	setupSolo();
-  	createCanvas(displayWidth*0.99, displayHeight*0.83);
+  	createCanvas(800, 600);
 
 	for (let i = 0; i < 100; i++){
 		stars.push( new Star() );
 	}
-}
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
 }
 
 function draw() {
@@ -90,6 +86,16 @@ function draw() {
 	if (over === true){
 		gameOver();
 	}
+
+	// crt effect
+	push(); 
+	noFill();
+	stroke(0, 50);
+	strokeWeight(1);
+	for (let i = 0; i < 600; i += 3) {
+	    line(0, i, 800, i);
+	}
+	pop();
 }
 
 function resetAllHighScores() {
@@ -104,79 +110,3 @@ function resetAllHighScores() {
     console.log("High Scores have been reset!");
 }
 
-// handles ALL actions when a key is pressed
-function keyPressed() {
-	// 13 = enter key
-	if (keyCode === 13) {
-		if (pageState === "title") {
-			pageState = "gameMode"; 
-			timer = 0;
-	    }
-	}
-
-	// 27 = escape key
-	if (keyCode === 27) {
-		if (pageState === "gameMode") {
-			pageState = "title";
-	    }
-	    if (pageState === "solo") {
-			pageState = "gameMode";
-			over = false;
-	    }
-	}
-
-	//  49 = "1"
-	if (keyCode === 49) {
-		if (pageState === "gameMode") {
-			resetSolo();
-			pageState = "solo";
-	    }
-	}
-
-	//  50= "2"
-	if (keyCode === 50) {
-		if (pageState === "gameMode") {
-			pageState = "duo";
-	    }
-	}
-
-	//  51 = "3"
-	if (keyCode === 51) {
-		if (pageState === "gameMode") {
-			pageState = "pvp";
-	    }
-	}
-
-	//  78 = "N" key
-	if (keyCode === 78) {
-		if (pageState === "title") {
-			stage = 1;
-		}
-	}
-
-	//  82 = "R" key
-	if (keyCode === 82) {
-		if (over === true) {
-			resetSolo();
-			pageState = "solo";
-	    }
-		if (pageState === "title") {
-			stage = 2;
-			// resetAllHighScores();
-		}
-	}
-
-	//  89 = "Y" key
-	if (keyCode === 89) {
-		if (pageState === "title" && stage === 2) {
-			resetHighScore = 120;
-			stage = 1;
-			isHSReset = true;
-	    	resetAllHighScores();
-		}
-	}
-
-	if (pageState === "solo") {
-        keyPressedSolo(); 
-    }
-}

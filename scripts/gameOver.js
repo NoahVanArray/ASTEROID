@@ -14,7 +14,7 @@ function gameOver(){
     textAlign(CENTER);
     fill(overColor);
     textFont(headers);
-    text('GAME OVER', width / 2, height / 2.22);
+    text('GAME OVER', width / 2, height / 3);
 
     textSize(windowWidth/55);
     fill(goldColor);
