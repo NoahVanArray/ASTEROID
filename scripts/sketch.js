@@ -80,7 +80,7 @@ function draw() {
 		drawSolo();
 	}
 	else if (pageState === "duo"){
-		// duo();
+		drawDuo();
 	}
 	else if (pageState === "pvp"){
 		// pvp();
