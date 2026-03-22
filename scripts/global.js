@@ -35,22 +35,34 @@
 		    // 2. Main Title (using your global colors)
 		    textFont(headers);
 		    fill(greenColor); 
-		    textSize(windowWidth / 25);
+		    textSize(36);
 		    text(titleText, width / 2, height / 3);
 
 		    // 3. Instructions (Only for the "Ready" screen)
 		    if (showControls) {
-		        textFont(texts);
-		        textSize(windowWidth / 60);
-		        fill(goldColor);
-		        text("W - Thrust", width / 2, height / 2 - 60);
-		        text("A / D - Rotate", width / 2, height / 2 - 20);
-		        text("SHIFT - Shoot", width / 2, height / 2 + 20);
-		        text("P - Pause/Resume", width / 2, height / 2 + 60);
+				textFont(texts);
+				textSize(24);
+				fill(goldColor);
+				text("W - Thrust", width / 2, height / 2 - 30);
+				text("A / D - Rotate", width / 2, height / 2);
+				text("SHIFT - Shoot", width / 2, height / 2 + 30);
+				text("P - Pause Game", width / 2, height / 2 + 60);
+				text("P - Pause/Resume", width / 2, height / 2 + 60);
 
-		        fill(redColor); // Making it red so it stands out as an "Exit"
-		        text("ESC - Exit to Menu", width / 2, height / 2 + 100);
+			    fill(redColor); // Making it red so it stands out as an "Exit"
+			    text("ESC - Exit to Menu", width / 2, height / 2 + 100);
+			}
+			
+
+		    // 4. Flashing Subtitle
+		    if (frameCount % 60 < 30) {
+		        textFont(texts);
+		        fill(255);
+		        textSize(24);
+		        text(subtitleText, width / 2, height / 1.5);
 		    }
+		
+
 
 		    // 4. Flashing Subtitle
 		    if (frameCount % 60 < 30) {

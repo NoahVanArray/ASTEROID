@@ -68,7 +68,10 @@ function setup() {
 	setupGlobal();
 	// load all gameMode setups here
   	setupSolo();
-  	createCanvas(800, 600);
+  	
+	let cnv = createCanvas(800, 600);
+	cnv.style('display', 'block');
+	cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
 
 	for (let i = 0; i < 100; i++){
 		stars.push( new Star() );

@@ -2,34 +2,35 @@ let stage = 1;
 let isHSReset = false;
 
 function title(){
+	textAlign(CENTER, CENTER);
+
 	// TITLE TEXT LEZGOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-    textSize(windowWidth/16);
-	textAlign(CENTER);
-  	fill(greenColor);
+    textSize(64);
+    fill(greenColor);
     textFont(headers);
-    text('ASTEROIDS', width / 2, height / 2);
+    text('ASTEROIDS', 400, 250);
 
     if (frameCount % 65 < 30) {
-        textSize(windowWidth/50);
-      	fill(goldColor);
+        textSize(20);
+        fill(goldColor);
         textFont(texts);
-        text('press ENTER to start', width / 2, height / 1.7);
+        text('press ENTER to start', 400, 340); 
     }
 
-    if (stage === 1){
-        textSize(windowWidth/70);
+    if (stage === 1) {
+        textSize(14);
         fill(252, 124, 5);
         textFont(texts);
-        text('press R to reset ALL High Score', width / 2, height / 1.2);
+        text('press R to reset ALL High Score', 400, 500);
 
-        // ... Reset text display ...
-        if (isHSReset && resetHighScore > 0) {
-            textSize(windowWidth / 60);
-            textFont(texts);
-            fill(255, 50, 50, resetHighScore * 8); // Multiplier depends on how fast you want it to fade
-            text('HIGH SCORES WIPED!', width / 2, height / 1.1);
-            
-            resetHighScore--;
+        if (isHSReset === true && stage === 1) {
+            if (resetHighScore > 0) {
+                textSize(16);
+                textFont(texts);
+                fill(255, 50, 50, resetHighScore * 8); // fades the thing, nice fx // also, on stuff like this, better to declare the rbg code directly
+                text('HIGH SCORES WIPED!', 400, 540);
+                
+                resetHighScore--;
             
             // When timer hits zero, turn the switch back off
             if (resetHighScore <= 0) {
@@ -38,13 +39,11 @@ function title(){
         }
     }
     
-    if (stage === 2){
+    if (stage === 2) {
         isHSReset = false;
-        textSize(windowWidth/70);
+        textSize(14);
         fill(redColor);
         textFont(texts);
-        text('are you sure? Y/N', width / 2, height / 1.2);
+        text('are you sure? Y/N', 400, 500);
     }
-
-    
 }
