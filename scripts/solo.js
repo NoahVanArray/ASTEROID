@@ -25,8 +25,7 @@ function setupSolo() {
 
 function drawSolo() {
     if (over === true) {
-        displayAllSolo(); // Keep the graveyard visible
-        // You can add your Game Over text here later
+        displayAllSolo(); 
     } 
     else if (!started) {
         // --- READY SCREEN ---
@@ -36,28 +35,32 @@ function drawSolo() {
     else if (paused) {
         // --- PAUSE SCREEN ---
         displayAllSolo(); 
-        drawOverlay("PAUSED", "Press P to Resume", false);
+        drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
-        // --- ACTIVE GAMEPLAY ---
-        
-        // 1. Timer Calculation (Subtracting time spent paused)
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
-        // 2. Difficulty Scaling (Your logic)
         if (timer > 0 && timer % 30 === 0 && timer !== lastDifficultyIncreaseTime) {
-            spawnAsteroids(20, 10);
-            spawnAsteroids(60, 2); 
-            spawnAsteroids(40, 3); 
-            lastDifficultyIncreaseTime = timer; 
+          spawnAsteroids(20, 10);
+          spawnAsteroids(60, 2); 
+          spawnAsteroids(40, 3); 
+          lastDifficultyIncreaseTime = timer; 
         }
 
-        // 3. Update & Display Everything
+        if (timer > highScores.solo && !hsAnnounced && timer > 0) {
+          // 1. Save it to local storage permanently!
+          updateHighScore('solo', timer); 
+          
+          // 2. Trigger the visuals
+          hsAnnounced = true;
+          hsPopupTimer = 180;
+          newHighScoreSound.play();
+        }
+
         updateAllSolo();
         displayAllSolo();
 
-        // 4. Draw the Timer UI (Your specific style)
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -67,6 +70,57 @@ function drawSolo() {
         fill('#39FF14');
         textFont(headers);
         text("Score: " + timer, 30, 30);
+
+        textSize(displayWidth / 110); // Keeping your same scale
+        textAlign(RIGHT, TOP);
+        noStroke();
+
+        // 1. Shadow/Offset for readability (Black)
+        fill(0);
+        text("Best: " + highScores.solo, width - 33, 33);
+
+        // 2. Main Text (Neon Gold/Yellow looks great for a record)
+        textFont(headers);
+        fill(255, 200, 0); 
+        text("Best: " + highScores.solo, width - 30, 30);
+
+        if (hsPopupTimer > 0) {
+          push();
+          // 1. Make it blink using the timer
+          // If the timer is even, show it; if odd, hide it (rapid blink)
+          if (floor(hsPopupTimer / 10) % 2 === 0) { 
+              
+            // 2. Add that Neon Glow
+            drawingContext.shadowColor = color(57, 255, 20); // Neon Green
+            drawingContext.shadowBlur = 20;
+            
+            fill(57, 255, 20);
+            textSize(32);
+            textAlign(CENTER);
+            textFont(headers);
+            
+            // Position it just above the player or at the top center
+            text("NEW HIGH SCORE!", width / 2, 100);
+            
+            // 3. Update the high score in real-time on the UI
+            // This ensures the "High Score" number at the top matches your current score immediately
+            highScores.solo = timer; 
+          }
+          
+          hsPopupTimer--; // Count down until it disappears
+          pop();
+        }
+
+        if (plusTenTimer > 0) {
+            textSize(displayWidth / 110);
+            textFont(headers);
+            fill(255, 200, 0, plusTenTimer * 8); // Multiplier depends on how fast you want it to fade
+            text('+10!', 200, 30);
+            
+            plusTenTimer--;
+            
+        }
+
     }
 
 }
@@ -118,6 +172,7 @@ function handleCollisions() {
                 splitAsteroid(asteroids[j]);
                 asteroids.splice(j, 1);
                 lasers.splice(i, 1);
+                asteroidSound.play();
                 break; 
             }
         }
@@ -131,6 +186,7 @@ function handleCollisions() {
                 activatePowerup(); 
                 powerups.splice(j, 1);
                 lasers.splice(i, 1);
+                powerUpSound.play();
                 break;
             }
         }
@@ -166,13 +222,13 @@ function splitAsteroid(asteroid) {
 function checkShipAsteroidCollision() {
 	updateHighScore('solo', timer);
 
-  	if (shipInvincible) {
-    	if (millis() - shipInvincibleTime > currentInvincDuration) {
-      	shipInvincible = false;
-        currentInvincDuration = 3000;
-    	}
-    	return;
+  if (shipInvincible) {
+  	if (millis() - shipInvincibleTime > currentInvincDuration) {
+    	shipInvincible = false;
+      currentInvincDuration = 3000;
   	}
+  	return;
+  }
 
   for (let asteroid of asteroids) {
     let d = dist(
@@ -183,12 +239,13 @@ function checkShipAsteroidCollision() {
     );
 
     if (d < asteroid.r + ship.size / 2) {
-      
+      gameOverSound.play();
       over = true;
       timer = timer;
       // ship.respawn();
       break;
     }
+
   }
 }
 
@@ -384,10 +441,18 @@ function activatePowerup() {
     shipInvincible = true;
     shipInvincibleTime = millis();
     currentInvincDuration = 20000; 
-  } else if (roll === 1) {
-    // skill 2L timer jump for 10sec
+  } 
+
+  else if (roll === 1) {
+    // skill 2: timer jump for 10sec
+    addScorePowerUpSound.play();
     gameStartTime -= 10000; 
-  } else if (roll === 2) {
+    
+    // --- TRIGGER THE DISPLAY ---
+    plusTenTimer = 90; // Show for 1.5 seconds (at 60fps)
+  }
+
+  else if (roll === 2) {
     // skill 3: burst laser
     multiShotActive = true;
     multiShotEndTime = millis() + 15000;
@@ -424,12 +489,15 @@ function resetSolo() {
   
   lastDifficultyIncreaseTime = 0;
   
+  hsAnnounced = false; 
+  hsPopupTimer = 0;
 }
 
 // controls for solo 
 function handleSoloControls() {
     // --- 1. START TRIGGER (Enter) ---
     if (!started && keyCode === ENTER) {
+        keyPressSound.play();
         started = true;
         gameStartTime = millis();
         pausedTime = 0;
@@ -444,6 +512,7 @@ function handleSoloControls() {
         } else {
             pausedTime += (millis() - pauseStartTime);
         }
+        keyPressSound.play();
     }
 
     // --- 3. SHOOTING & POWERUPS (Shift) ---
@@ -451,11 +520,13 @@ function handleSoloControls() {
     if (started && !paused && !over && keyCode === SHIFT) {
         // Checking for the Skill 3 (Burst Fire) Powerup
         if (multiShotActive && millis() < multiShotEndTime) {
+            upgradedLaserSound.play();
             lasers.push(new Laser(ship.pos, ship.angle));        // Center
             lasers.push(new Laser(ship.pos, ship.angle - 0.2));  // Left
             lasers.push(new Laser(ship.pos, ship.angle + 0.2));  // Right
         } else {
             lasers.push(ship.fire()); // Normal single laser
+            laserSound.play();
         }
     }
 }

@@ -3,7 +3,7 @@
 	let pageState = "title";
 
 	// text visibility timer for notifying user that high score is reset'd
-	let resetHighScore = 0;
+    let resetHighScore = 0;
 
 	// vv for scoring vv 
 	let gameStartTime = 0;
@@ -19,47 +19,56 @@
 
 // FOR ALL MODES
 	// handles pause 
-	let started = false;
-	let paused = false;
+		let started = false;
+		let paused = false;
 
-	let pausedTime = 0;
-	let pauseStartTime = 0;
+		let pausedTime = 0;
+		let pauseStartTime = 0;
 
-	function drawOverlay(titleText, subtitleText, showControls) {
-	    // 1. Background Dimmer
-	    fill(0, 0, 0, 180); 
-	    rect(0, 0, width, height);
+		function drawOverlay(titleText, subtitleText, showControls) {
+		    // 1. Background Dimmer
+		    fill(0, 0, 0, 180); 
+		    rect(0, 0, width, height);
 
-	    textAlign(CENTER, CENTER);
-	    
-	    // 2. Main Title (using your global colors)
-	    textFont(headers);
-	    fill(greenColor); 
-	    textSize(windowWidth / 25);
-	    text(titleText, width / 2, height / 3);
+		    textAlign(CENTER, CENTER);
+		    
+		    // 2. Main Title (using your global colors)
+		    textFont(headers);
+		    fill(greenColor); 
+		    textSize(windowWidth / 25);
+		    text(titleText, width / 2, height / 3);
 
-	    // 3. Instructions (Only for the "Ready" screen)
-	    if (showControls) {
-	        textFont(texts);
-	        textSize(windowWidth / 60);
-	        fill(goldColor);
-	        text("W - Thrust", width / 2, height / 2 - 40);
-	        text("A / D - Rotate", width / 2, height / 2);
-	        text("SHIFT - Shoot", width / 2, height / 2 + 40);
-	        text("P - Pause Game", width / 2, height / 2 + 80);
-	    }
+		    // 3. Instructions (Only for the "Ready" screen)
+		    if (showControls) {
+		        textFont(texts);
+		        textSize(windowWidth / 60);
+		        fill(goldColor);
+		        text("W - Thrust", width / 2, height / 2 - 60);
+		        text("A / D - Rotate", width / 2, height / 2 - 20);
+		        text("SHIFT - Shoot", width / 2, height / 2 + 20);
+		        text("P - Pause/Resume", width / 2, height / 2 + 60);
 
-	    // 4. Flashing Subtitle
-	    if (frameCount % 60 < 30) {
-	        textFont(texts);
-	        fill(255);
-	        textSize(windowWidth / 70);
-	        text(subtitleText, width / 2, height / 1.5);
-	    }
-	}
+		        fill(redColor); // Making it red so it stands out as an "Exit"
+		        text("ESC - Exit to Menu", width / 2, height / 2 + 100);
+		    }
 
-	let arcadeCosmetics;
+		    // 4. Flashing Subtitle
+		    if (frameCount % 60 < 30) {
+		        textFont(texts);
+		        fill(255);
+		        textSize(windowWidth / 70);
+		        text(subtitleText, width / 2, height / 1.5);
+		    }
+		}
 
+	// shows HIGHSCORE POPUP and sound
+
+		let hsAnnounced = false; // Prevents the popup from triggering 60 times a second
+		let hsPopupTimer = 0;    // How long the message stays on screen
+
+	// other vars
+
+		let plusTenTimer = 0; // Tracks how long the +10 stays on screen
 	
 // FOR solo.js
 	let over = false;
@@ -161,33 +170,52 @@
 function keyPressed() {
     // --- TITLE ---
     if (pageState === "title") {
-        if (keyCode === ENTER) pageState = "gameMode";
-        if (keyCode === 82) stage = 2; // 'R' for Reset
-        if (keyCode === 89 && stage === 2) { // 'Y' for Yes
-            resetAllHighScores();
-            resetHighScore = 120;
-            stage = 1;
+        if (keyCode === ENTER) {
+            gameStartSound.play(); // Moved inside here!
+            pageState = "gameMode";
         }
-    }
+        
+        if (keyCode === 82) { // 'R' for Reset
+        	keyPressSound.play();
+	        stage = 2; 
+	    }
 
+	    if (keyCode === 89 && stage === 2) { // 'Y' for Yes
+	        resetAllHighScores(); // Clears memory
+	    	hsResetSound.play();
+	        resetHighScore = 120; // Sets timer to 2 seconds (at 60fps)
+	        isHSReset = true;     // <--- THE MISSING SWITCH!
+	        stage = 1;            // Go back to main title
+	    }
+
+	    if (keyCode === 78 && stage === 2) { // 'N' for No
+	    	keyPressSound.play();
+	        stage = 1; // Just go back without resetting
+	    }
+    } 
     // --- SELECTION ---
     else if (pageState === "gameMode") {
-        if (keyCode === ESCAPE) pageState = "title";
+        if (keyCode === ESCAPE) {
+        	keyPressSound.play();
+            pageState = "title";
+        }
         if (keyCode === 49) { // '1'
+            keyPressSound.play();
             resetSolo();
             pageState = "solo";
         }
-    }
-
+    } 
     // --- SOLO ---
     else if (pageState === "solo") {
-        if (keyCode === ESCAPE) {
+        if (keyCode === ESCAPE  && paused === true) {
+        	keyPressSound.play();
             pageState = "gameMode";
             over = false;
         }
-        if (keyCode === 82 && over) resetSolo(); // 'R' to restart after death
+        if (keyCode === 82 && over) {
+            resetSolo(); // 'R' to restart
+        }
 
-        // Use the helper!
         handleSoloControls();
     }
 }

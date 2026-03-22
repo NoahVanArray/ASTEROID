@@ -15,6 +15,14 @@
 		- Death					Ongoing
 		- Asteroids 	    	DONE
 		- Powerups				Ongoing
+	- Sounds:
+		- Laser Shots			Ongoing 1
+		- Asteroid Broken		Ongoing 1
+		- Power Up 				Ongoing 1 
+		- Key Press				Ongoing 1
+		- GameOver				Ongoing 1
+		- Victory (for 2P)		----
+		- Highscore 			Ongoing 1
 	- Game Modes: 				
 		- Solo					Ongoing
 		- Duo 					----
@@ -26,7 +34,6 @@
 				- bgm 
 				
 			Yoe:
-				- blinking phase transition
 				- sfx
 
 
@@ -42,6 +49,18 @@ function preload() {
 	preloadSolo();	
 	preloadGameMode();
 
+	// sounds here
+	laserSound = loadSound('assets/sounds/short laser shot 1.wav');
+	upgradedLaserSound = loadSound('assets/sounds/short laser shot 1 upg.wav');
+	asteroidSound = loadSound('assets/sounds/crushingRocks1Edited.wav');
+	powerUpSound = loadSound('assets/sounds/powerUp.wav');
+	gameOverSound = loadSound('assets/sounds/gameOver.wav');
+	gameStartSound = loadSound('assets/sounds/gameStart.wav');
+	keyPressSound = loadSound('assets/sounds/keyPress.wav');
+	newHighScoreSound = loadSound('assets/sounds/newHighScore.wav');
+	addScorePowerUpSound = loadSound('assets/sounds/addScorePowerUp.wav');
+	hsResetSound = loadSound('assets/sounds/hsReset.wav');
+	
 }
 
 function setup() {

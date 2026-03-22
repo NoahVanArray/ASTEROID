@@ -22,14 +22,18 @@ function title(){
         textFont(texts);
         text('press R to reset ALL High Score', width / 2, height / 1.2);
 
-        if (isHSReset === true && stage === 1){
-            if (resetHighScore > 0) {
-                textSize(windowWidth / 60);
-                textFont(texts);
-                fill(255, 50, 50, resetHighScore * 7); // fades the thing, nice fx // also, on stuff like this, better to declare the rbg code directly
-                text('HIGH SCORES WIPED!', width / 2, height / 1.1);
-                
-                resetHighScore--;
+        // ... Reset text display ...
+        if (isHSReset && resetHighScore > 0) {
+            textSize(windowWidth / 60);
+            textFont(texts);
+            fill(255, 50, 50, resetHighScore * 8); // Multiplier depends on how fast you want it to fade
+            text('HIGH SCORES WIPED!', width / 2, height / 1.1);
+            
+            resetHighScore--;
+            
+            // When timer hits zero, turn the switch back off
+            if (resetHighScore <= 0) {
+                isHSReset = false;
             }
         }
     }
