@@ -14,7 +14,7 @@ function preloadSolo() {
 function setupSolo() {
   
   // ship default spawn
-  ship = new Ship();
+  ship = new Ship(width/2, height/2, { up: 87, left: 65, right: 68 });
   
   // asteroid default spawn
   spawnAsteroids(60, 5);  // large
@@ -31,6 +31,7 @@ function drawSolo() {
         // --- READY SCREEN ---
         displayAllSolo(); // Show ship/asteroids frozen in place
         drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
+
     } 
     else if (paused) {
         // --- PAUSE SCREEN ---
@@ -115,7 +116,7 @@ function drawSolo() {
             textSize(displayWidth / 110);
             textFont(headers);
             fill(255, 200, 0, plusTenTimer * 8); // Multiplier depends on how fast you want it to fade
-            text('+10!', 200, 30);
+            text('+10!', 180, 50);
             
             plusTenTimer--;
             
@@ -193,31 +194,6 @@ function handleCollisions() {
     }
 }
 
-function spawnAsteroids(size, count) {
-  for (let i = 0; i < count; i++) {
-    asteroids.push(new Asteroid(null, size));
-  }
-}
-
-function splitAsteroid(asteroid) {
-  let pieces = 3;
-  let newSize;
-
-  if (asteroid.r === 60) {
-    newSize = 40; // large to medium
-  } else if (asteroid.r === 40) {
-    newSize = 20; // medium to small
-  } else {
-    return; // small asteroid: no split
-  }
-
-  for (let i = 0; i < pieces; i++) {
-    let newPos = asteroid.pos.copy();
-    let newAsteroid = new Asteroid(newPos, newSize);
-
-    asteroids.push(newAsteroid);
-  }
-}
 
 function checkShipAsteroidCollision() {
 	updateHighScore('solo', timer);
@@ -269,169 +245,9 @@ function checkLargeAsteroidRespawn() {
 
 
 
-class Ship {
-  constructor() {
-    this.pos = createVector(width / 2, height / 2);
-    this.vel = createVector(0, 0);
-    this.angle = 0;
-    this.drag = 0.99;
-    this.size = 40;
-    this.isThrusting = false;
-  }
-
-  update() {
-    // rotate
-    if (over === false){
-        if (keyIsDown(65)) this.angle -= 0.08; // A
-        if (keyIsDown(68)) this.angle += 0.08; // D
-	    // thrust
-	    this.isThrusting = keyIsDown(87); // W
-	    if (this.isThrusting) {
-	      let force = p5.Vector.fromAngle(this.angle);
-	      force.mult(0.2);
-	      this.vel.add(force);
-	    }
-    }
-
-    // physics (anueraw????? eme HAHAHAHHA)
-    this.vel.mult(this.drag);
-    this.pos.add(this.vel);
-
-    // screeen size
-    if (this.pos.x > width) this.pos.x = 0;
-    if (this.pos.x < 0) this.pos.x = width;
-    if (this.pos.y > height) this.pos.y = 0;
-    if (this.pos.y < 0) this.pos.y = height;
-  }
-
-  display() {
-    if (shipInvincible) {
-    if (floor(millis() % 200) < 100) {
-      return; 
-    }
-  }
-
-  let currentImg = this.isThrusting ? (over ? ship1Img : thrust1Img): ship1Img;
-  push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.angle + HALF_PI);
-    imageMode(CENTER);
-    image(currentImg, 0, 0, this.size, this.size);
-  pop();
-}
-
-  fire() {
-    return new Laser(this.pos, this.angle);
-  }
-
-  respawn() {
-    this.pos = createVector(random(width), random(height));
-    this.vel.set(0, 0);
-    this.angle = 0;
-
-    shipInvincible = true;
-    shipInvincibleTime = millis();
-  }
-}
 
 
 
-class Laser {
-  constructor(shipPos, shipAngle) {
-    this.pos = createVector(shipPos.x, shipPos.y);
-    this.vel = p5.Vector.fromAngle(shipAngle);
-    this.vel.mult(10); // lazerspeed
-    this.angle = shipAngle;
-  }
-   update() {
-    this.pos.add(this.vel);
-  }
-
-  display() {
-    push();
-      translate(this.pos.x, this.pos.y);
-      rotate(this.angle + HALF_PI);
-      imageMode(CENTER);
-      image(lazerImg, 0, 0, 10, 30);
-    pop();
-  }
-
-  offScreen() {
-    return (this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0);
-  }
-}
-
-
-
-class Asteroid {
-  constructor(p, r) {
-    if (p) {
-      this.pos = p.copy();
-    } else {
-      let side = floor(random(4));
-      
-      if (side === 0) { // top
-        this.pos = createVector(random(width), -r || -60);
-      } else if (side === 1) { // bot
-        this.pos = createVector(random(width), height + (r || 60));
-      } else if (side === 2) { // left
-        this.pos = createVector(-r || -60, random(height));
-      } else { // right
-        this.pos = createVector(width + (r || 60), random(height));
-      }
-    }
-    
-    this.r = r || 60;
-    this.vel = p5.Vector.random2D().mult(random(0.30, 1));
-    this.rotation = random(TWO_PI);
-    this.rotSpeed = random(-0.02, 0.02);
-  }
-
-  update() {
-    this.pos.add(this.vel);
-    this.rotation += this.rotSpeed;
-    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-  }
-
-  display() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.rotation);
-    imageMode(CENTER);
-    let img = smallAsteroid;
-    if (this.r === 60) img = largeAsteroid;
-    if (this.r === 40) img = mediumAsteroid;
-    image(img, 0, 0, this.r * 2, this.r * 2);
-    pop();
-  }
-}
-
-class PowerupAsteroid {
-  constructor() {
-    this.pos = createVector(random(width), -30);
-    this.r = 25;
-    this.vel = p5.Vector.random2D().mult(2);
-  }
-  update() {
-    this.pos.add(this.vel);
-    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-  }
-
-  // random shape muna kasi ala pa aq asset nagagawa
-  display() {
-    push();
-    fill(255, 215, 0);
-    noStroke();
-    circle(this.pos.x, this.pos.y, this.r * 2);
-    pop();
-  }
-}
 
 function activatePowerup() {
   let roll = floor(random(3));
@@ -476,7 +292,12 @@ function resetSolo() {
   powerupSpawnTracker = 0;
   currentInvincDuration = 3000;
 
-  ship = new Ship();
+  ship = new Ship(width / 2, height / 2, { 
+    up: 87, 
+    left: 65, 
+    right: 68, 
+    shoot: 16 
+  });
   ship.pos = createVector(width / 2, height / 2);
   ship.vel.set(0, 0);
 

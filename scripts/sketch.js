@@ -99,7 +99,7 @@ function draw() {
 		drawSolo();
 	}
 	else if (pageState === "duo"){
-		// duo();
+		duo();
 	}
 	else if (pageState === "pvp"){
 		// pvp();
