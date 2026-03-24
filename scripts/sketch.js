@@ -62,7 +62,7 @@ function preload() {
 	newHighScoreSound = loadSound('assets/sounds/newHighScore.wav');
 	addScorePowerUpSound = loadSound('assets/sounds/addScorePowerUp.wav');
 	hsResetSound = loadSound('assets/sounds/hsReset.wav');
-	
+	bgm = loadSound('assets/sounds/ASTEROID.wav');
 }
 
 function setup() {

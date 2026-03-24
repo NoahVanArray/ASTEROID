@@ -1,6 +1,7 @@
 
 // FOR sketch.js
 	let pageState = "title";
+	let bgm;
 
 	// text visibility timer for notifying user that high score is reset'd
     let resetHighScore = 0;

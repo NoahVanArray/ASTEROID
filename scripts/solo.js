@@ -24,6 +24,7 @@ function setupSolo() {
 
 
 function drawSolo() {
+
     if (overState === true) {
         displayAllSolo(); 
     } 
@@ -320,6 +321,9 @@ function handleSoloControls() {
     if (!started && keyCode === ENTER) {
         keyPressSound.play();
         started = true;
+        if (!bgm.isPlaying()) {
+            bgm.loop();
+        }
         gameStartTime = millis();
         pausedTime = 0;
         return; // Exit so we don't accidentally shoot on the same frame

@@ -46,4 +46,12 @@ function title() {
         textFont(texts);
         text('are you sure? Y/N', 400, 500);
     }
-} // <--- Added this to close the whole function!
+
+    handleTitleControls();
+}
+
+function handleTitleControls(){
+    if (!bgm.isPlaying()) {
+        bgm.loop();
+    }
+}
