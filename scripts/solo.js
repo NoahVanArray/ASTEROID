@@ -217,6 +217,7 @@ function checkShipAsteroidCollision() {
 
     if (d < asteroid.r + ship.size / 2) {
       gameOverSound.play();
+      splitAsteroid(asteroid)
       overState = true;
       timer = timer;
       // ship.respawn();
