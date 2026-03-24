@@ -610,15 +610,34 @@ function keyPressed() {
 
         // 4. SHOOTING (Only if started and NOT paused)
         if (started && !paused && !overState) {
+            
+            // Check if the Triple-Shot powerup is active
+            let isMulti = (multiShotActive && millis() < multiShotEndTime);
+
             // Player 1: Shift
             if (keyCode === SHIFT && !ship1.isDead) {
-                lasers.push(ship1.fire());
-                laserSound.play();
+                if (isMulti) {
+                    if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
+                    lasers.push(new Laser1(ship1.pos, ship1.angle));
+                    lasers.push(new Laser1(ship1.pos, ship1.angle - 0.2));
+                    lasers.push(new Laser1(ship1.pos, ship1.angle + 0.2));
+                } else {
+                    lasers.push(ship1.fire());
+                    if (typeof laserSound !== 'undefined') laserSound.play();
+                }
             }
+            
             // Player 2: Period (.)
             if (keyCode === 190 && !ship2.isDead) {
-                lasers.push(ship2.fire());
-                laserSound.play();
+                if (isMulti) {
+                    if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
+                    lasers.push(new Laser2(ship2.pos, ship2.angle));
+                    lasers.push(new Laser2(ship2.pos, ship2.angle - 0.2));
+                    lasers.push(new Laser2(ship2.pos, ship2.angle + 0.2));
+                } else {
+                    lasers.push(ship2.fire());
+                    if (typeof laserSound !== 'undefined') laserSound.play();
+                }
             }
         }
 
