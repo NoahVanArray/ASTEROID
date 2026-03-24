@@ -565,6 +565,11 @@ function keyPressed() {
             resetDuo();
             pageState = "duo";
         }
+        if (keyCode === 51) { // '3'
+            keyPressSound.play();
+            setupPvp();
+            pageState = "pvp";
+        }
     } 
     // --- SOLO ---
     else if (pageState === "solo") {
@@ -645,5 +650,9 @@ function keyPressed() {
         if (keyCode === 82 && overState) {
             resetDuo();
         }
+    }
+
+    else if (pageState === "pvp") {
+        handlePvpControls();
     }
 }
