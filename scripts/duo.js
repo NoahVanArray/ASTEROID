@@ -18,30 +18,79 @@ function preloadDuo() {
 }
 
 function setupDuo() {
-    // Player 1: WASD
     ship1 = new Ship1(width/2 - 100, height/2, { up: 87, left: 65, right: 68 });
-    // Player 2: Arrows
     ship2 = new Ship2(width/2 + 100, height/2, { up: 38, left: 37, right: 39 });
     
     asteroids = [];
     lasers = [];
+    
+    // Reset universal flags for the new round
     overState = false;
+    started = false; 
+    paused = false;
+
+    hsAnnounced = false; 
+    hsPopupTimer = 0;
 }
 
 function drawDuo() {
+    if (overState) {
+        displayAllDuo(); 
+        gameOver(); 
+    } 
+    else if (!started) {
+        displayAllDuo(); 
+        drawOverlay("DUO MODE", "Press ENTER to Begin", true);
+    } 
+    else if (paused) {
+        displayAllDuo();
+        drawOverlay("PAUSED", "Press P to Resume", true);
+    } 
+    else {
+        // --- GAMEPLAY ---
+        ship1.update();
+        ship1.display();
+        ship2.update();
+        ship2.display();
+        handleDuoCollisions();
 
-    // DRAW BOTH SHIPS REGARDLESS of life status
-    // The Ship classes now handle their own "dead" behavior internally
-    ship1.update();
-    ship1.display();
-    
-    ship2.update();
-    ship2.display();
+        if (frameCount % 60 === 0) {
+            asteroids.push(new Asteroid());
+        }
 
-    handleDuoCollisions();
+        // 1. CALCULATE LIVE TIMER
+        let liveTimer = floor((millis() - gameStartTime - pausedTime) / 1000);
 
-    if (frameCount % 60 === 0 && !overState) {
-        asteroids.push(new Asteroid());
+        // 2. NEW HIGH SCORE POPUP LOGIC
+        // Using highScores.duo from your scores.js
+        if (liveTimer > highScores.duo && highScores.duo > 0 && !hsAnnounced) {
+            hsAnnounced = true;
+            hsPopupTimer = millis();
+        }
+
+        if (hsAnnounced && millis() - hsPopupTimer < 2000) {
+            push();
+            textAlign(CENTER);
+            textFont(headers);
+            textSize(32);
+            fill(goldColor);
+            if (frameCount % 20 < 10) { // Flicker effect
+                text("NEW HIGH SCORE!", width / 2, 100);
+            }
+            pop();
+        }
+
+        // 3. HUD (The "Best" and "Time" text)
+        textAlign(LEFT);
+        textFont(texts);
+        fill(255);
+        textSize(20);
+        text("TIME: " + liveTimer + "s", 30, 40);
+
+        textAlign(RIGHT);
+        fill(goldColor);
+        // This ensures "BEST" pulls from the duo record
+        text("BEST: " + highScores.duo + "s", width - 30, 40);
     }
 }
 
@@ -87,15 +136,29 @@ function handleDuoCollisions() {
 
         // END GAME ONLY IF BOTH ARE DEAD
         if (ship1.isDead && ship2.isDead) {
-            overState = true;
+            if (!overState) {
+                overState = true;
+                timer = floor((millis() - gameStartTime - pausedTime) / 1000);
+                
+                // This ensures the record is saved to local storage
+                updateHighScore('duo', timer); 
+            }
         }
     }
 }
 
+// Just like displayAllSolo, this shows the world during pause/ready/death
+function displayAllDuo() {
+    ship1.display();
+    ship2.display();
+    for (let a of asteroids) a.display();
+    for (let l of lasers) l.display();
+}
+
 function resetDuo() {
-    setupDuo(); // Just call setupDuo to keep it DRY (Don't Repeat Yourself)
-    timer = 0;
+    setupDuo(); 
     gameStartTime = millis();
+    pausedTime = 0;
 }
 
 // Note: If you use the Ship1/Ship2 update() logic, 

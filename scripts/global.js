@@ -416,43 +416,55 @@
 		let pauseStartTime = 0;
 
 		function drawOverlay(titleText, subtitleText, showControls) {
-		    // 1. Background Dimmer
 		    fill(0, 0, 0, 180); 
 		    rect(0, 0, width, height);
 
 		    textAlign(CENTER, CENTER);
-		    
-		    // 2. Main Title (using your global colors)
 		    textFont(headers);
 		    fill(greenColor); 
 		    textSize(36);
 		    text(titleText, width / 2, height / 3);
 
-		    // 3. Instructions (Only for the "Ready" screen)
 		    if (showControls) {
-				textFont(texts);
-				textSize(24);
-				fill(goldColor);
-				text("W - Thrust", width / 2, height / 2 - 30);
-				text("A / D - Rotate", width / 2, height / 2);
-				text("SHIFT - Shoot", width / 2, height / 2 + 30);
-				text("P - Pause/Resume", width / 2, height / 2 + 60);
+		        textFont(texts);
+		        textSize(20);
+		        
+		        if (pageState === "solo") {
+		            fill(goldColor);
+		            text("W - Thrust", width / 2, height / 2 - 30);
+		            text("A / D - Rotate", width / 2, height / 2);
+		            text("SHIFT - Shoot", width / 2, height / 2 + 30);
+		        } 
+		        else if (pageState === "duo") {
+		            // Player 1 Column
+		            fill(goldColor);
+		            textAlign(RIGHT);
+		            text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
+		            text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
+		            
+		            // Player 2 Column
+		            fill(orangeColor);
+		            textAlign(LEFT);
+		            text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
+		            text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
+		            
+		            textAlign(CENTER);
+		        }
 
-			    fill(redColor); // Making it red so it stands out as an "Exit"
-			    text("ESC - Exit to Menu", width / 2, height / 2 + 230);
-			}
-			
+		        fill(255);
+		        text("P - Pause/Resume", width / 2, height / 2 + 60);
+		        fill(redColor);
+		        text("ESC - Exit to Menu", width / 2, height / 2 + 220);
+		    }
 
-		    // 4. Flashing Subtitle
-		    if (frameCount % 60 < 30) {
+		    // Flicker Logic
+		    if (floor(millis() % 1000) < 500) {
 		        textFont(texts);
 		        fill(255);
 		        textSize(24);
 		        text(subtitleText, width / 2, height / 1.4);
 		    }
-
 		}
-
 	// shows HIGHSCORE POPUP and sound
 		let hsAnnounced = false; // Prevents the popup from triggering 60 times a second
 		let hsPopupTimer = 0;    // How long the message stays on screen
@@ -568,17 +580,51 @@ function keyPressed() {
         handleSoloControls();
     }
     // DUO
+    // --- DUO SECTION ---
     else if (pageState === "duo") {
-        // Add !ship1.isDead check here
-        if (keyCode === SHIFT && !ship1.isDead) { 
-            lasers.push(ship1.fire());
-            laserSound.play();
+        
+        // 1. START TRIGGER
+        if (!started && keyCode === ENTER) {
+            keyPressSound.play();
+            started = true;
+            gameStartTime = millis();
+            return;
         }
-        // Add !ship2.isDead check here
-        if (keyCode === 190 && !ship2.isDead) { // "." key
-            lasers.push(ship2.fire());
-            laserSound.play();
+
+        // 2. PAUSE TRIGGER
+        if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
+            paused = !paused;
+            keyPressSound.play();
+            if (paused) pauseStartTime = millis();
+            else pausedTime += (millis() - pauseStartTime);
+            return;
         }
-        if (keyCode === 82 && overState) resetDuo(); 
+
+        // 3. EXIT TRIGGER (Esc)
+        if (keyCode === ESCAPE && (paused || overState || !started)) {
+            keyPressSound.play();
+            pageState = "gameMode";
+            overState = false;
+            started = false;
+        }
+
+        // 4. SHOOTING (Only if started and NOT paused)
+        if (started && !paused && !overState) {
+            // Player 1: Shift
+            if (keyCode === SHIFT && !ship1.isDead) {
+                lasers.push(ship1.fire());
+                laserSound.play();
+            }
+            // Player 2: Period (.)
+            if (keyCode === 190 && !ship2.isDead) {
+                lasers.push(ship2.fire());
+                laserSound.play();
+            }
+        }
+
+        // 5. RESTART TRIGGER
+        if (keyCode === 82 && overState) {
+            resetDuo();
+        }
     }
 }

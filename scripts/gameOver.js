@@ -21,7 +21,11 @@ function gameOver(){
     textSize(24); 
     fill(goldColor);
     textFont(texts);
-    text('HIGHEST SCORE: ' + highScores.solo, width / 2, height / 2);
+    
+    // Check which high score to show
+    let displayHS = (pageState === "duo") ? highScores.duo : highScores.solo;
+    
+    text('HIGHEST SCORE: ' + displayHS, width / 2, height / 2);
     text('Your Score: ' + timer, width / 2, height / 2 + 40);
 
     // other kemerut
