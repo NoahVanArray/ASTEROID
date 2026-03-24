@@ -567,7 +567,7 @@ function keyPressed() {
         }
         if (keyCode === 51) { // '3'
             keyPressSound.play();
-            resetPvp();
+            setupPvp();
             pageState = "pvp";
         }
     } 
@@ -584,8 +584,8 @@ function keyPressed() {
 
         handleSoloControls();
     }
-
-    // --- DUO ---
+    // DUO
+    // --- DUO SECTION ---
     else if (pageState === "duo") {
         
         // 1. START TRIGGER
@@ -652,55 +652,7 @@ function keyPressed() {
         }
     }
 
-    // --- PVP ---
-    // Inside global.js key press logic for PvP Mode (or Duo, wherever your PvP inputs are)
-	else if (pageState === "pvp") {
-        
-        // 1. START TRIGGER (Enter)
-        if (!started && keyCode === ENTER) {
-            if (typeof keyPressSound !== 'undefined') keyPressSound.play();
-            started = true;
-            gameStartTime = millis();
-            return;
-        }
-
-        // 2. PAUSE & RESUME (P)
-        if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
-            paused = !paused;
-            if (typeof keyPressSound !== 'undefined') keyPressSound.play();
-            if (paused) pauseStartTime = millis();
-            else pausedTime += (millis() - pauseStartTime);
-            return;
-        }
-
-        // 3. EXIT TO MENU (Escape)
-        if (keyCode === ESCAPE && (paused || overState || !started)) {
-            if (typeof keyPressSound !== 'undefined') keyPressSound.play();
-            pageState = "gameMode"; // Ensure this matches your menu state string
-            overState = false;
-            started = false;
-            return;
-        }
-
-        // 4. REMATCH / RESTART (R)
-        if (overState && (keyCode === 82 || key.toLowerCase() === 'r')) {
-            resetPvp();
-            return;
-        }
-
-        // 5. SHOOTING LOGIC
-        if (started && !paused && !overState) {
-            // Player 1: Shift
-            if (keyCode === SHIFT && ship1.lives > 0) { 
-			    let p1Laser = new Laser1(ship1.pos.copy(), ship1.angle);
-			    p1Laser.owner = "p1"; // Tag the owner
-			    lasers.push(p1Laser);
-			}
-			if (keyCode === 190 && ship2.lives > 0) { 
-			    let p2Laser = new Laser2(ship2.pos.copy(), ship2.angle);
-			    p2Laser.owner = "p2"; // Tag the owner
-			    lasers.push(p2Laser);
-			}
-        }
+    else if (pageState === "pvp") {
+        handlePvpControls();
     }
 }

@@ -46,10 +46,10 @@
 
 function preload() {
 	// load all gameMode preloads here
+	preloadGameMode();
 	preloadSolo();	
 	preloadDuo();
 	preloadPvp();
-	preloadGameMode();
 
 	// sounds here
 	laserSound = loadSound('assets/sounds/short laser shot 1.wav');
