@@ -1,20 +1,20 @@
 
 function preloadSolo() {
-  ship1Img = loadImage(ship1b64);
-  thrust1Img = loadImage(thrust1b64);
-  lazerImg = loadImage(laser2b64);
-  ship1Invincibility = loadImage(shipInvincibilityb64);
-  shipNoLife = loadImage(ship1NoLifeb64);
+  ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
+  thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
+  lazerImg = loadImage('assets/graphics/bullets/laser1.png');
+  ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+  shipNoLife = loadImage('assets/graphics/spaceships/ship1LoseLives.png');
 
-  largeAsteroid = loadImage(lg_asteroidb64);
-  mediumAsteroid = loadImage(md_asteroidb64);
-  smallAsteroid = loadImage(sm_asteroidb64);
+  largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
+  mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
+  smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
 }
 
 function setupSolo() {
   
   // ship default spawn
-  ship = new Ship(width/2, height/2, { up: 87, left: 65, right: 68 });
+  ship = new Ship1(width/2, height/2, { up: 87, left: 65, right: 68 });
   
   // asteroid default spawn
   spawnAsteroids(60, 5);  // large
@@ -24,7 +24,7 @@ function setupSolo() {
 
 
 function drawSolo() {
-    if (over === true) {
+    if (overState === true) {
         displayAllSolo(); 
     } 
     else if (!started) {
@@ -216,7 +216,7 @@ function checkShipAsteroidCollision() {
 
     if (d < asteroid.r + ship.size / 2) {
       gameOverSound.play();
-      over = true;
+      overState = true;
       timer = timer;
       // ship.respawn();
       break;
@@ -281,7 +281,7 @@ function resetSolo() {
   started = false;
   paused = false;
 
-  over = false;
+  overState = false;
   
   asteroids = [];
   lasers = [];
@@ -292,7 +292,7 @@ function resetSolo() {
   powerupSpawnTracker = 0;
   currentInvincDuration = 3000;
 
-  ship = new Ship(width / 2, height / 2, { 
+  ship = new Ship1(width / 2, height / 2, { 
     up: 87, 
     left: 65, 
     right: 68, 
@@ -326,7 +326,7 @@ function handleSoloControls() {
     }
 
     // --- 2. PAUSE TRIGGER (P) ---
-    if (started && !over && (keyCode === 80 || key.toLowerCase() === 'p')) {
+    if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
         paused = !paused;
         if (paused) {
             pauseStartTime = millis();
@@ -338,13 +338,13 @@ function handleSoloControls() {
 
     // --- 3. SHOOTING & POWERUPS (Shift) ---
     // We only shoot if the game is started, NOT paused, and NOT over
-    if (started && !paused && !over && keyCode === SHIFT) {
+    if (started && !paused && !overState && keyCode === SHIFT) {
         // Checking for the Skill 3 (Burst Fire) Powerup
         if (multiShotActive && millis() < multiShotEndTime) {
             upgradedLaserSound.play();
-            lasers.push(new Laser(ship.pos, ship.angle));        // Center
-            lasers.push(new Laser(ship.pos, ship.angle - 0.2));  // Left
-            lasers.push(new Laser(ship.pos, ship.angle + 0.2));  // Right
+            lasers.push(new Laser1(ship.pos, ship.angle));        // Center
+            lasers.push(new Laser1(ship.pos, ship.angle - 0.2));  // Left
+            lasers.push(new Laser1(ship.pos, ship.angle + 0.2));  // Right
         } else {
             lasers.push(ship.fire()); // Normal single laser
             laserSound.play();

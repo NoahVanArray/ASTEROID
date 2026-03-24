@@ -47,6 +47,7 @@
 function preload() {
 	// load all gameMode preloads here
 	preloadSolo();	
+	preloadDuo();
 	preloadGameMode();
 
 	// sounds here
@@ -68,6 +69,7 @@ function setup() {
 	setupGlobal();
 	// load all gameMode setups here
   	setupSolo();
+  	setupDuo();
   	
 	let cnv = createCanvas(800, 600);
 	cnv.style('display', 'block');
@@ -99,13 +101,13 @@ function draw() {
 		drawSolo();
 	}
 	else if (pageState === "duo"){
-		duo();
+		drawDuo();
 	}
 	else if (pageState === "pvp"){
 		// pvp();
 	} 	
 	// REMINDER: over/gameOver IS NOT a state, bruh
-	if (over === true){
+	if (overState === true){
 		gameOver();
 	}
 
