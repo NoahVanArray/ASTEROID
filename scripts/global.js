@@ -48,7 +48,7 @@
 	const LARGE_RESPAWN_DELAY = 10000;
 
 	// asteroids variables
-	let smallAsteroid, largeAsteroid, mediumAsteroid;
+	let smallAsteroid, largeAsteroid, mediumAsteroid, specialPowerAsteroid1, specialPowerAsteroid2;
 
 	function resetGame() {
 	    // Reset universal flags
@@ -386,27 +386,37 @@
 	}
 
 	class PowerupAsteroid {
-	  constructor() {
-	    this.pos = createVector(random(width), -30);
-	    this.r = 25;
-	    this.vel = p5.Vector.random2D().mult(2);
-	  }
-	  update() {
-	    this.pos.add(this.vel);
-	    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-	    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-	    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-	    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-	  }
+		constructor() {
+			this.pos = createVector(random(width), -30);
+			this.r = 25;
+			this.vel = p5.Vector.random2D().mult(2);
 
-	  // random shape muna kasi ala pa aq asset nagagawa
-	  display() {
-	    push();
-	    fill(255, 215, 0);
-	    noStroke();
-	    circle(this.pos.x, this.pos.y, this.r * 2);
-	    pop();
-	  }
+			this.type = floor(random(3)); 
+
+			if (this.type === 0) {
+			this.img = specialPowerAsteroid1; 
+			} else if (this.type === 1) {
+			this.img = specialPowerAsteroid2;
+			} else {
+			this.img = specialPowerAsteroid1;
+			}
+		}
+
+		update() {
+			this.pos.add(this.vel);
+			this.edges();
+		}
+
+		display() {
+			push();
+			translate(this.pos.x, this.pos.y);
+			rotate(this.rotation);
+			imageMode(CENTER);
+			if (this.img) {
+			image(this.img, 0, 0, this.r * 2, this.r * 2);
+			}
+			pop();
+		}
 	}
 
 	// handles pause 
@@ -417,55 +427,76 @@
 		let pauseStartTime = 0;
 
 		function drawOverlay(titleText, subtitleText, showControls) {
-		    fill(0, 0, 0, 180); 
-		    rect(0, 0, width, height);
+		fill(0, 0, 0, 180); 
+		rect(0, 0, width, height);
 
-		    textAlign(CENTER, CENTER);
-		    textFont(headers);
-		    fill(greenColor); 
-		    textSize(36);
-		    text(titleText, width / 2, height / 3);
+		textAlign(CENTER, CENTER);
+		textFont(headers);
+		fill(greenColor); 
+		textSize(36);
+		text(titleText, width / 2, height / 3);
 
-		    if (showControls) {
-		        textFont(texts);
-		        textSize(20);
-		        
-		        if (pageState === "solo") {
-		            fill(goldColor);
-		            text("W - Thrust", width / 2, height / 2 - 30);
-		            text("A / D - Rotate", width / 2, height / 2);
-		            text("SHIFT - Shoot", width / 2, height / 2 + 30);
-		        } 
-		        else if (pageState === "duo") {
-		            // Player 1 Column
-		            fill(goldColor);
-		            textAlign(RIGHT);
-		            text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
-		            text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
-		            
-		            // Player 2 Column
-		            fill(orangeColor);
-		            textAlign(LEFT);
-		            text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
-		            text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
-		            
-		            textAlign(CENTER);
-		        }
+		if (showControls) {
+			textFont(texts);
+			textSize(20);
+			
+			if (pageState === "solo") {
+				// Matching the "Column" style from the Duo image
+				fill(goldColor);
+				textAlign(RIGHT);
+				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
+				
+				fill(goldColor);
+				textAlign(LEFT);
+				text("Shoot: SHIFT", width / 2 + 40, height / 2 - 40);
+				
+				textAlign(CENTER);
+			} 
+			else if (pageState === "duo") {
+				// Player 1 Column
+				fill(goldColor);
+				textAlign(RIGHT);
+				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
+				text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
+				
+				// Player 2 Column
+				fill(orangeColor);
+				textAlign(LEFT);
+				text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
+				text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
+				
+				textAlign(CENTER);
+			}
+			else if (pageState === "pvp") {
+				// Player 1
+				fill(goldColor);
+				textAlign(RIGHT);
+				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
+				text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
+				
+				// Player 2
+				fill(orangeColor); // Or whatever color Ship 2 is!
+				textAlign(LEFT);
+				text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
+				text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
+				
+				textAlign(CENTER);
+			}
 
-		        fill(255);
-		        text("P - Pause/Resume", width / 2, height / 2 + 60);
-		        fill(redColor);
-		        text("ESC - Exit to Menu", width / 2, height / 2 + 220);
-		    }
-
-		    // Flicker Logic
-		    if (floor(millis() % 1000) < 500) {
-		        textFont(texts);
-		        fill(255);
-		        textSize(24);
-		        text(subtitleText, width / 2, height / 1.4);
-		    }
+			fill(255);
+			text("P - Pause/Resume", width / 2, height / 2 + 60);
+			fill(redColor);
+			text("ESC - Exit to Menu", width / 2, height / 2 + 220);
 		}
+
+		// Flicker Logic for the "Press Enter" prompt
+		if (floor(millis() % 1000) < 500) {
+			textFont(texts);
+			fill(255);
+			textSize(24);
+			text(subtitleText, width / 2, height / 1.4);
+		}
+	}
 	// shows HIGHSCORE POPUP and sound
 		let hsAnnounced = false; // Prevents the popup from triggering 60 times a second
 		let hsPopupTimer = 0;    // How long the message stays on screen
@@ -592,6 +623,9 @@ function keyPressed() {
         // 1. START TRIGGER
         if (!started && keyCode === ENTER) {
             keyPressSound.play();
+			if (!bgm.isPlaying()) {
+				bgm.loop(); 
+			}
             started = true;
             gameStartTime = millis();
             return;
@@ -654,6 +688,11 @@ function keyPressed() {
     }
 
     else if (pageState === "pvp") {
+		if (keyCode === ESCAPE && (!pvpStarted || pvpOver || pvpPaused)) {
+            keyPressSound.play();
+            pageState = "gameMode";
+            return;
+        }
         handlePvpControls();
     }
 }

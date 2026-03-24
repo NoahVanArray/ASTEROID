@@ -9,6 +9,8 @@ function preloadSolo() {
   largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
   mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
   smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+  specialPowerAsteroid1 = loadImage("assets/graphics/asteroids/specialPower 1.png");
+  specialPowerAsteroid2 = loadImage("assets/graphics/asteroids/specialPower 2.png");
 }
 
 function setupSolo() {
@@ -216,8 +218,8 @@ function checkShipAsteroidCollision() {
     );
 
     if (d < asteroid.r + ship.size / 2) {
+      bgm.stop();
       gameOverSound.play();
-      splitAsteroid(asteroid)
       overState = true;
       timer = timer;
       // ship.respawn();
@@ -251,27 +253,22 @@ function checkLargeAsteroidRespawn() {
 
 
 
-function activatePowerup() {
-  let roll = floor(random(3));
+function activatePowerup(p) {
   
-  if (roll === 0) {
-    // skill 1: invincibility 20 sec
+  if (p.type === 0) {
+    // Skill 1: Invincibility
     shipInvincible = true;
     shipInvincibleTime = millis();
     currentInvincDuration = 20000; 
   } 
-
-  else if (roll === 1) {
-    // skill 2: timer jump for 10sec
+  else if (p.type === 1) {
+    // Skill 2: +10 Seconds Pop-up
     addScorePowerUpSound.play();
-    gameStartTime -= 10000; 
-    
-    // --- TRIGGER THE DISPLAY ---
-    plusTenTimer = 90; // Show for 1.5 seconds (at 60fps)
+    plusTenActive = true;
+    plusTenTimer = POPUP_DURATION; 
   }
-
-  else if (roll === 2) {
-    // skill 3: burst laser
+  else if (p.type === 2) {
+    // Skill 3: Burst Laser
     multiShotActive = true;
     multiShotEndTime = millis() + 15000;
   }
@@ -321,10 +318,10 @@ function handleSoloControls() {
     // --- 1. START TRIGGER (Enter) ---
     if (!started && keyCode === ENTER) {
         keyPressSound.play();
-        started = true;
         if (!bgm.isPlaying()) {
             bgm.loop();
         }
+        started = true;
         gameStartTime = millis();
         pausedTime = 0;
         return; // Exit so we don't accidentally shoot on the same frame

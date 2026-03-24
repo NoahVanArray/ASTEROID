@@ -85,7 +85,7 @@ function drawPvp() {
     }
 
     if (!pvpStarted) {
-        drawOverlay("PVP MODE", "P1: WASD + SHIFT | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
+        drawOverlay("PVP MODE", "Press ENTER to Start", true);
     } else if (pvpOver) {
         drawPvpWinnerOverlay();
     } else if (pvpPaused) {
@@ -207,10 +207,12 @@ function updatePvpLogic() {
 
 function checkPvpVictory() {
     if (ship1.lives <= 0) {
+        bgm.stop();
         ship1.lives = 0;
         winner = "PLAYER 2";
         pvpOver = true;
     } else if (ship2.lives <= 0) {
+        bgm.stop();
         ship2.lives = 0;
         winner = "PLAYER 1";
         pvpOver = true;
@@ -248,6 +250,9 @@ function drawPvpWinnerOverlay() {
 function handlePvpControls() {
     if (!pvpStarted && keyCode === ENTER) {
         pvpStarted = true;
+        if (!bgm.isPlaying()) {
+            bgm.loop();
+        }
     }
 
     if (pvpStarted && !pvpOver && (keyCode === 80 || key.toLowerCase() === 'p')) {

@@ -47,11 +47,4 @@ function title() {
         text('are you sure? Y/N', 400, 500);
     }
 
-    handleTitleControls();
-}
-
-function handleTitleControls(){
-    if (!bgm.isPlaying()) {
-        bgm.loop();
-    }
 }
