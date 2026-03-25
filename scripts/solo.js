@@ -1,14 +1,16 @@
 
 function preloadSolo() {
-  ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
-  thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
-  lazerImg = loadImage('assets/graphics/bullets/laser1.png');
-  ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
-  shipNoLife = loadImage('assets/graphics/spaceships/ship1LoseLives.png');
+    ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
+    thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
+    lazerImg = loadImage('assets/graphics/bullets/laser1.png');
+    ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+    shipNoLife = loadImage('assets/graphics/spaceships/ship1LoseLives.png');
 
-  largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
-  mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
-  smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+    largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
+    mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
+    smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+
+    powerupAsteroidImg = loadImage("assets/graphics/asteroids/specialPower_2-NoBGpng.png");
 }
 
 function setupSolo() {
@@ -66,20 +68,30 @@ function drawSolo() {
         textAlign(LEFT, TOP);
         noStroke();
         strokeWeight(3);
+        push();
+        drawingContext.shadowColor = color('#000000'); 
+        drawingContext.shadowBlur = 20;
         fill('#000000');
         text("Score: " + timer, 33, 33);
+        pop();
+        push();
+        drawingContext.shadowColor = color('#39FF14'); 
+        drawingContext.shadowBlur = 20;
         fill('#39FF14');
         textFont(headers);
         text("Score: " + timer, 30, 30);
-
+        pop();
         textSize(displayWidth / 110); // Keeping your same scale
         textAlign(RIGHT, TOP);
         noStroke();
 
         // 1. Shadow/Offset for readability (Black)
+        push();
+        drawingContext.shadowColor = color('#000000'); 
+        drawingContext.shadowBlur = 20;
         fill(0);
         text("Best: " + highScores.solo, width - 33, 33);
-
+        pop();
         // 2. Main Text (Neon Gold/Yellow looks great for a record)
         textFont(headers);
         fill(255, 200, 0); 

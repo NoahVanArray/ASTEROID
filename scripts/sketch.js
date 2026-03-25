@@ -62,25 +62,36 @@ function preload() {
 	newHighScoreSound = loadSound('assets/sounds/newHighScore.wav');
 	addScorePowerUpSound = loadSound('assets/sounds/addScorePowerUp.wav');
 	hsResetSound = loadSound('assets/sounds/hsReset.wav');
+	pvpVictory = loadSound('assets/sounds/pvpVictory.wav');
 	
 }
 
 function setup() {
-	loadHighScores();	
-	setupGlobal();
-	// load all gameMode setups here
-  	setupSolo();
-  	setupDuo();
-  	setupPvp();
-  	
-	let cnv = createCanvas(800, 600);
-	cnv.style('display', 'block');
-	cnv.position((windowWidth - width) / 2, (windowHeight - height) / 2);
+    loadHighScores();    
+    setupGlobal();
+    setupSolo();
+    setupDuo();
+    setupPvp();
+    
+    cnv = createCanvas(800, 600);
+    cnv.style('display', 'block'); // Helps prevent weird scrollbar issues
+    centerCanvas(); // Call it once at the start
 
-	for (let i = 0; i < 100; i++){
-		stars.push( new Star() );
-	}
+    for (let i = 0; i < 100; i++){
+        stars.push( new Star() );
+    }
+}
 
+// 1. The logic for centering
+function centerCanvas() {
+    let x = (windowWidth - width) / 2;
+    let y = (windowHeight - height) / 2;
+    cnv.position(x, y);
+}
+
+// 2. The magic trigger
+function windowResized() {
+    centerCanvas();
 }
 
 function draw() {

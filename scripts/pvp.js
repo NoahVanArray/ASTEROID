@@ -126,17 +126,17 @@ function updatePvpLogic() {
         // Laser vs Asteroids
         for (let j = asteroids.length - 1; j >= 0; j--) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y) < asteroids[j].r) {
-                // FIXED: Changed .break() to .breakup() to match your class
-                if (typeof asteroids[j].breakup === 'function') {
-                    let newAsteroids = asteroids[j].breakup();
-                    if (newAsteroids && newAsteroids.length > 0) {
-                        asteroids = asteroids.concat(newAsteroids);
-                    }
-                }
+                splitAsteroid(asteroids[j]); 
                 asteroids.splice(j, 1);
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play();
                 laserHitSomething = true;
                 break; 
             }
+        }
+
+        if (laserHitSomething) {
+            lasers.splice(i, 1);
+            continue;
         }
 
         if (laserHitSomething) {
@@ -179,16 +179,17 @@ function updatePvpLogic() {
         // Ship 1 vs Asteroid
         let d1 = dist(ship1.pos.x, ship1.pos.y, asteroids[i].pos.x, asteroids[i].pos.y);
         if (d1 < (ship1.size / 2) + asteroids[i].r) {
-            // Apply damage only if not in cooldown
             if (millis() > p1HitTimer + HIT_COOLDOWN) {
-                ship1.lives -= 1; // Direct life loss
+                ship1.lives -= 1;
                 p1HitTimer = millis();
+                
+                splitAsteroid(asteroids[i]); 
+                asteroids.splice(i, 1); 
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play();
+                
+                checkPvpVictory();
+                continue;
             }
-            // Still apply bump force
-            let pushForce = p5.Vector.sub(ship1.pos, asteroids[i].pos);
-            pushForce.setMag(4);
-            ship1.vel.add(pushForce);
-            checkPvpVictory();
         }
 
         // Ship 2 vs Asteroid
@@ -197,11 +198,14 @@ function updatePvpLogic() {
             if (millis() > p2HitTimer + HIT_COOLDOWN) {
                 ship2.lives -= 1;
                 p2HitTimer = millis();
+
+                splitAsteroid(asteroids[i]);
+                asteroids.splice(i, 1);
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play();
+
+                checkPvpVictory();
+                continue;
             }
-            let pushForce = p5.Vector.sub(ship2.pos, asteroids[i].pos);
-            pushForce.setMag(4);
-            ship2.vel.add(pushForce);
-            checkPvpVictory();
         }
     }
 }
@@ -211,11 +215,14 @@ function checkPvpVictory() {
         ship1.lives = 0;
         winner = "PLAYER 2";
         pvpOver = true;
+        pvpVictory.play();
     } else if (ship2.lives <= 0) {
         ship2.lives = 0;
         winner = "PLAYER 1";
         pvpOver = true;
+        pvpVictory.play();
     }
+
 }
 
 function drawPvpUi() {

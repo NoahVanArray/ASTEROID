@@ -47,7 +47,7 @@
 	const LARGE_RESPAWN_DELAY = 10000;
 
 	// asteroids variables
-	let smallAsteroid, largeAsteroid, mediumAsteroid;
+	let smallAsteroid, largeAsteroid, mediumAsteroid, powerupAsteroidImg;
 
 	function resetGame() {
 	    // Reset universal flags
@@ -385,27 +385,37 @@
 	}
 
 	class PowerupAsteroid {
-	  constructor() {
-	    this.pos = createVector(random(width), -30);
-	    this.r = 25;
-	    this.vel = p5.Vector.random2D().mult(2);
-	  }
-	  update() {
-	    this.pos.add(this.vel);
-	    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-	    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-	    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-	    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-	  }
+	    constructor() {
+	        this.pos = createVector(random(width), -30);
+	        this.r = 25;
+	        this.vel = p5.Vector.random2D().mult(2);
+	        
+	        // Optional: add a slight rotation effect like normal asteroids
+	        this.rotation = random(TWO_PI);
+	        this.rotSpeed = random(-0.05, 0.05); 
+	    }
+	    
+	    update() {
+	        this.pos.add(this.vel);
+	        this.rotation += this.rotSpeed; // apply rotation
 
-	  // random shape muna kasi ala pa aq asset nagagawa
-	  display() {
-	    push();
-	    fill(255, 215, 0);
-	    noStroke();
-	    circle(this.pos.x, this.pos.y, this.r * 2);
-	    pop();
-	  }
+	        if (this.pos.x > width + this.r) this.pos.x = -this.r;
+	        if (this.pos.x < -this.r) this.pos.x = width + this.r;
+	        if (this.pos.y > height + this.r) this.pos.y = -this.r;
+	        if (this.pos.y < -this.r) this.pos.y = height + this.r;
+	    }
+
+	    display() {
+	        push();
+	        translate(this.pos.x, this.pos.y);
+	        rotate(this.rotation); // Spin the powerup!
+	        imageMode(CENTER);
+	        
+	        // This variable MUST match the name you use in preload()
+	        image(powerupAsteroidImg, 0, 0, this.r * 2, this.r * 2);
+	        
+	        pop();
+	    }
 	}
 
 	// handles pause 
@@ -421,48 +431,84 @@
 
 		    textAlign(CENTER, CENTER);
 		    textFont(headers);
+		    push();
+	        drawingContext.shadowColor = color(greenColor); 
+	        drawingContext.shadowBlur = 20;
 		    fill(greenColor); 
-		    textSize(36);
+		    textSize(27);
 		    text(titleText, width / 2, height / 3);
+		    pop();
 
 		    if (showControls) {
 		        textFont(texts);
 		        textSize(20);
 		        
 		        if (pageState === "solo") {
+
+
+		        	push();
+			        drawingContext.shadowColor = color(goldColor); 
+			        drawingContext.shadowBlur = 20;
 		            fill(goldColor);
+		            textFont(headers);
+		            textSize(44);
+		        	text("SOLO MODE", width / 2, 111);
+		        	textFont(texts);
+		        	textSize(20);
 		            text("W - Thrust", width / 2, height / 2 - 30);
 		            text("A / D - Rotate", width / 2, height / 2);
 		            text("SHIFT - Shoot", width / 2, height / 2 + 30);
+		            pop();
 		        } 
 		        else if (pageState === "duo") {
 		            // Player 1 Column
-		            fill(goldColor);
-		            textAlign(RIGHT);
-		            text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
-		            text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
-		            
-		            // Player 2 Column
+		            push();
+			        drawingContext.shadowColor = color(orangeColor); 
+			        drawingContext.shadowBlur = 20;
 		            fill(orangeColor);
-		            textAlign(LEFT);
-		            text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
-		            text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
-		            
+		            textAlign(CENTER);
+		            text("PLAYER 1", width / 2 - 166, height / 2 - 48);
+		            text("Move: WASD Keys", width / 2 - 166, height / 2 - 18);
+		            text("Shoot: SHIFT", width / 2 - 166, height / 2 - -12);
+		            pop();
+		            // Player 2 Column
+		            push();
+			        drawingContext.shadowColor = color("#52a1c8"); 
+			        drawingContext.shadowBlur = 20;
+		            fill("#52a1c8");
+		            textAlign(CENTER);
+		            text("PLAYER 2", width / 2 + 166, height / 2 - 48);
+		            text("Move: ARROW Keys", width / 2 + 166, height / 2 - 18);
+		            text("Shoot: PERIOD(.) Key", width / 2 + 166, height / 2 - -12);
+		            pop();
 		            textAlign(CENTER);
 		        }
 
+		        push();
+		        drawingContext.shadowColor = color(255); 
+		        drawingContext.shadowBlur = 20;
 		        fill(255);
 		        text("P - Pause/Resume", width / 2, height / 2 + 60);
+		        pop();
+		        push();
+		        drawingContext.shadowColor = color(redColor); 
+		        drawingContext.shadowBlur = 20;
 		        fill(redColor);
-		        text("ESC - Exit to Menu", width / 2, height / 2 + 220);
+		        text("ESC - Exit to Game Modes", width / 2, height / 2 + 220);
+		        pop();
 		    }
 
 		    // Flicker Logic
 		    if (floor(millis() % 1000) < 500) {
 		        textFont(texts);
+
+		        push();
+		        drawingContext.shadowColor = color(255); 
+		        drawingContext.shadowBlur = 20;
 		        fill(255);
 		        textSize(24);
 		        text(subtitleText, width / 2, height / 1.4);
+		        pop();
 		    }
 		}
 	// shows HIGHSCORE POPUP and sound
