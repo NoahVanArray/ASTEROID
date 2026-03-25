@@ -41,13 +41,13 @@ function drawSolo() {
         displayAllSolo(); 
     } 
     else if (!started) {
-        // --- READY SCREEN ---
-        displayAllSolo(); // Show ship/asteroids frozen in place
+        // ready
+        displayAllSolo(); 
         drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
 
     } 
     else if (paused) {
-        // --- PAUSE SCREEN ---
+        // pause
         displayAllSolo(); 
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
@@ -63,10 +63,8 @@ function drawSolo() {
         }
 
         if (timer > highScores.solo && !hsAnnounced && timer > 0) {
-          // 1. Save it to local storage permanently!
           updateHighScore('solo', timer); 
           
-          // 2. Trigger the visuals
           hsAnnounced = true;
           hsPopupTimer = 180;
           newHighScoreSound.play();
@@ -92,30 +90,26 @@ function drawSolo() {
         textFont(headers);
         text("TIME: " + timer, 30, 30);
         pop();
-        textSize(displayWidth / 110); // Keeping your same scale
+        textSize(displayWidth / 110);
         textAlign(RIGHT, TOP);
         noStroke();
 
-        // 1. Shadow/Offset for readability (Black)
         push();
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
         fill(0);
         text("BEST: " + highScores.solo, width - 33, 33);
         pop();
-        // 2. Main Text (Neon Gold/Yellow looks great for a record)
+        
         textFont(headers);
         fill(255, 200, 0); 
         text("BEST: " + highScores.solo, width - 30, 30);
 
         if (hsPopupTimer > 0) {
           push();
-          // 1. Make it blink using the timer
-          // If the timer is even, show it; if odd, hide it (rapid blink)
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
               
-            // 2. Add that Neon Glow
-            drawingContext.shadowColor = color(57, 255, 20); // Neon Green
+            drawingContext.shadowColor = color(57, 255, 20); 
             drawingContext.shadowBlur = 20;
             
             fill(57, 255, 20);
@@ -123,22 +117,19 @@ function drawSolo() {
             textAlign(CENTER);
             textFont(headers);
             
-            // Position it just above the player or at the top center
             text("NEW HIGH SCORE!", width / 2, 100);
             
-            // 3. Update the high score in real-time on the UI
-            // This ensures the "High Score" number at the top matches your current score immediately
             highScores.solo = timer; 
           }
           
-          hsPopupTimer--; // Count down until it disappears
+          hsPopupTimer--; 
           pop();
         }
 
         if (plusTenTimer > 0) {
             textSize(displayWidth / 110);
             textFont(headers);
-            fill(255, 200, 0, plusTenTimer * 8); // Multiplier depends on how fast you want it to fade
+            fill(255, 200, 0, plusTenTimer * 8); 
             text('+10!', 180, 50);
             
             plusTenTimer--;
@@ -147,35 +138,34 @@ function drawSolo() {
 
     }
 
-    // 1. Randomly spawn an alien (e.g., 0.5% chance per frame)
+    // random alien spawn
     if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
         aliens.push(new Alien());
     }
 
-    // 2. Update and Draw Aliens
+    // update and display aliean
     for (let i = aliens.length - 1; i >= 0; i--) {
-        aliens[i].update([ship]); // Pass the single ship as target
+        aliens[i].update([ship]);
         aliens[i].display();
 
-        // Check if player's lasers hit the alien
+        // laser hit aliean
         for (let j = lasers.length - 1; j >= 0; j--) {
             if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
                 aliens.splice(i, 1);
                 lasers.splice(j, 1);
-                // play explosion sound here
                 break;
             }
         }
     }
 
-    // 3. Update Alien Lasers
+    // update alien laser
     for (let i = alienLasers.length - 1; i >= 0; i--) {
         alienLasers[i].update();
         alienLasers[i].display();
 
-        // Check if Alien laser hits player
+        // alen hits player
         if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < ship.r) {
-            ship.lives -= 1; // Or trigger your death logic
+            ship.lives -= 1;
             alienLasers.splice(i, 1);
             continue;
         }
@@ -187,21 +177,21 @@ function drawSolo() {
 }
 
 function updateAllSolo() {
-    // Ship
+    // hhip
     ship.update();
 
-    // Lasers
+    // lasers
     for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].update();
         if (lasers[i].offScreen()) lasers.splice(i, 1);
     }
 
-    // Asteroids
+    // asteroids
     for (let asteroid of asteroids) {
         asteroid.update();
     }
 
-    // Powerups (Finals addition)
+    // powerups (finals addition)
     if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
         powerups.push(new PowerupAsteroid());
         powerupSpawnTracker = timer;
@@ -210,9 +200,7 @@ function updateAllSolo() {
         p.update();
     }
 
-    // --- ALL COLLISION LOGIC ---
     handleCollisions(); 
-
     checkLargeAsteroidRespawn();
     checkShipAsteroidCollision();
 }
@@ -225,7 +213,7 @@ function displayAllSolo() {
 }
 
 function handleCollisions() {
-    // Laser vs Asteroid
+    // laser vs asteroid
     for (let i = lasers.length - 1; i >= 0; i--) {
         for (let j = asteroids.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y);
@@ -239,7 +227,7 @@ function handleCollisions() {
         }
     }
 
-    // Laser vs Powerup
+    // laser vs powerup
     for (let i = lasers.length - 1; i >= 0; i--) {
         for (let j = powerups.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
@@ -279,7 +267,6 @@ function checkShipAsteroidCollision() {
       gameOverSound.play();
       overState = true;
       timer = timer;
-      // ship.respawn();
       break;
     }
 
@@ -295,7 +282,7 @@ function checkLargeAsteroidRespawn() {
     }
 
     if (millis() - largeAsteroidTimer > LARGE_RESPAWN_DELAY) {
-      spawnAsteroids(60, 5); // respawn 5 large
+      spawnAsteroids(60, 5);
       largeAsteroidTimer = 0;
     }
   } else {
@@ -313,19 +300,19 @@ function checkLargeAsteroidRespawn() {
 function activatePowerup(p) {
   
   if (p.type === 0) {
-    // Skill 1: Invincibility
+    // skill 1: invincibility
     shipInvincible = true;
     shipInvincibleTime = millis();
     currentInvincDuration = 20000; 
   } 
   else if (p.type === 1) {
-    // Skill 2: +10 Seconds Pop-up
+    // skill 2: +10 seconds pop-up
     addScorePowerUpSound.play();
     plusTenActive = true;
     plusTenTimer = POPUP_DURATION; 
   }
   else if (p.type === 2) {
-    // Skill 3: Burst Laser
+    // skill 3: burst laser
     multiShotActive = true;
     multiShotEndTime = millis() + 15000;
   }
@@ -372,7 +359,7 @@ function resetSolo() {
 
 // controls for solo 
 function handleSoloControls() {
-    // --- 1. START TRIGGER (Enter) ---
+    // start
     if (!started && keyCode === ENTER) {
         keyPressSound.play();
         if (!bgm.isPlaying()) {
@@ -381,10 +368,10 @@ function handleSoloControls() {
         started = true;
         gameStartTime = millis();
         pausedTime = 0;
-        return; // Exit so we don't accidentally shoot on the same frame
+        return;
     }
 
-    // --- 2. PAUSE TRIGGER (P) ---
+    // pause
     if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
         paused = !paused;
         if (paused) {
@@ -395,18 +382,15 @@ function handleSoloControls() {
         keyPressSound.play();
     }
 
-    // USE F TO SHOOT 
-    // --- 3. SHOOTING & POWERUPS (Shift) ---
-    // We only shoot if the game is started, NOT paused, and NOT over
+    // shooting
     if (started && !paused && !overState && keyCode === 70) {
-        // Checking for the Skill 3 (Burst Fire) Powerup
         if (multiShotActive && millis() < multiShotEndTime) {
             upgradedLaserSound.play();
-            lasers.push(new Laser1(ship.pos, ship.angle));        // Center
-            lasers.push(new Laser1(ship.pos, ship.angle - 0.2));  // Left
-            lasers.push(new Laser1(ship.pos, ship.angle + 0.2));  // Right
+            lasers.push(new Laser1(ship.pos, ship.angle));  // center
+            lasers.push(new Laser1(ship.pos, ship.angle - 0.2));  // left
+            lasers.push(new Laser1(ship.pos, ship.angle + 0.2));  // right
         } else {
-            lasers.push(ship.fire()); // Normal single laser
+            lasers.push(ship.fire());
             laserSound.play();
         }
     }

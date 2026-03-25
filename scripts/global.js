@@ -58,21 +58,19 @@
 	let smallAsteroid, largeAsteroid, mediumAsteroid, specialPowerAsteroid1, specialPowerAsteroid2;
 
 	function resetGame() {
-	    // Reset universal flags
 	    overState = false;
 	    lasers = [];
 	    asteroids = [];
 	    
-	    // Check which mode we are in and run that specific setup
+	    // mode setup
 	    if (gameMode === 'solo') {
 	        setupSolo(); 
 	    } else if (gameMode === 'duo') {
 	        setupDuo(); 
 	    } else if (gameMode === 'pvp') {
-	        // setupPvP(); // You'll build this next!
+	        
 	    }
 	    
-	    // Hide the menu and start the loop
 	    currentMenu = null; 
 	    loop(); 
 	}
@@ -104,7 +102,6 @@
 	  }
 	}
 
-	// --- SHIP 1 (Solo and Duo Player 1) ---
 	class Ship1 {
 	  constructor(x, y, controls) {
 	    this.pos = createVector(x, y);
@@ -118,18 +115,15 @@
 
 	  	update() {
 	  		if (this.isDead) {
-		        // High friction for the "drifting wreck" look
+		        // drift func
 		        this.vel.mult(0.97); 
 		        this.pos.add(this.vel);
-		        
-		        // Add a slow "dead spin" for effect
 		        this.angle += 0.02; 
 		        
-		        this.edges(); // Keep it wrapping around the screen
-		        return; // STOP HERE: Don't let the player move or turn
+		        this.edges();
+		        return; 
 		    }
 
-		  	// Simple, clean, and works for Solo, Duo, and PvP!
 		  	if (!overState) { 
 		    	if (keyIsDown(this.controls.left)) this.angle -= 0.08;
 		    	if (keyIsDown(this.controls.right)) this.angle += 0.08;
@@ -155,7 +149,7 @@
 		}
 
 		display() {
-		    // Your working flicker logic
+		    // flicker invincibility
 		    if (shipInvincible) {
 		        if (floor(millis() % 200) < 100) {
 		            return; 
@@ -163,8 +157,6 @@
 		    }
 
 		    let img = (this instanceof Ship1) ? ship1Img : ship2Img; 
-		    
-		    // Only show thrust if ALIVE and PRESSING KEY
 		    if (this.isThrusting && !this.isDead) {
 		        img = (this instanceof Ship1) ? thrust1Img : thrust2Img;
 		    }
@@ -178,7 +170,7 @@
 			drawingContext.shadowColor = (this instanceof Ship1) ? orangeColor : color("#52a1c8");
 
 		    if (this.isDead) {
-		        tint(255, 100); // Ghostly drift
+		        tint(255, 100);
 		    }
 
 		    image(img, 0, 0, this.size, this.size);
@@ -190,13 +182,8 @@
 		  	return new Laser1(this.pos, this.angle);
 		}
 
-		  // Add this inside the Ship1 AND Ship2 classes
 		  hits(asteroid) {
-		   	// Distance between centers
 		   	let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
-		   	
-		   	// ship.size/2 is its radius. 
-		   	// asteroid.r is ALREADY the radius.
 		   	if (d < (this.size / 2) + asteroid.r) { 
 		   	  return true;
 		   	}
@@ -204,7 +191,6 @@
 		  }
 		}
 
-	// --- SHIP 2 (Duo Player 2) ---
 	class Ship2 {
 	 	constructor(x, y, controls) {
 	 	 	this.pos = createVector(x, y);
@@ -218,14 +204,13 @@
 
 	  	update() {
 		  	if (this.isDead) {
-		        this.vel.mult(0.97); // Slow down
+		        this.vel.mult(0.97); 
 		        this.pos.add(this.vel);
-		        this.angle += 0.02;  // Add the drift spin (same as Ship 1)
+		        this.angle += 0.02; 
 		        this.edges(); 
 		        return; 
 		    }
 
-			// Simple, clean, and works for Solo, Duo, and PvP!
 			if (!overState) { 
 				if (keyIsDown(this.controls.left)) this.angle -= 0.08;
 				if (keyIsDown(this.controls.right)) this.angle += 0.08;
@@ -251,7 +236,6 @@
 	 	}
 
 		display() {
-		    // Your working flicker logic
 		    if (shipInvincible) {
 		        if (floor(millis() % 200) < 100) {
 		            return; 
@@ -259,8 +243,6 @@
 		    }
 
 		    let img = (this instanceof Ship1) ? ship1Img : ship2Img; 
-		    
-		    // Only show thrust if ALIVE and PRESSING KEY
 		    if (this.isThrusting && !this.isDead) {
 		        img = (this instanceof Ship1) ? thrust1Img : thrust2Img;
 		    }
@@ -274,7 +256,7 @@
 			drawingContext.shadowColor = (this instanceof Ship1) ? orangeColor : color("#52a1c8");
 
 		    if (this.isDead) {
-		        tint(255, 100); // Ghostly drift
+		        tint(255, 100);
 		    }
 
 		    image(img, 0, 0, this.size, this.size);
@@ -286,7 +268,6 @@
 	    return new Laser2(this.pos, this.angle);
 	  }
 
-	  // Add this inside the Ship1 AND Ship2 classes
 	  	hits(asteroid) {
 		    let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
 		    if (d < (this.size / 2) + asteroid.r) { 
@@ -296,7 +277,6 @@
 		}
 	}
 
-	// --- SEPARATE LASERS ---
 	class Laser1 {
 	  constructor(shipPos, shipAngle) {
 	    this.pos = shipPos.copy();
@@ -315,10 +295,8 @@
 	  }
 	  offScreen() { return (this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0); }
 
-	  // Add this inside the Laser1 AND Laser2 classes
 	  	hits(asteroid) {
 		    let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
-		    // Use asteroid.r instead of asteroid.size / 2
 		    if (d < 10 + asteroid.r) { 
 		        return true;
 		    }
@@ -339,15 +317,13 @@
 	 		translate(this.pos.x, this.pos.y);
 	 		rotate(this.angle + HALF_PI);
 	 		imageMode(CENTER);
-	 		image(lazer2Img, 0, 0, 10, 30); // Blue laser
+	 		image(lazer2Img, 0, 0, 10, 30);
 	 		pop();
 	 	}
 	 	offScreen() { return (this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0); }
 
-		// Add this inside the Laser1 AND Laser2 classes
 		hits(asteroid) {
 		    let d = dist(this.pos.x, this.pos.y, asteroid.pos.x, asteroid.pos.y);
-		    // CHANGE asteroid.size / 2 TO asteroid.r
 		    if (d < 10 + asteroid.r) { 
 		        return true;
 		    }
@@ -484,7 +460,6 @@
 			textSize(20);
 			
 			if (pageState === "solo") {
-				// Matching the "Column" style from the Duo image
 				fill(goldColor);
 				textAlign(RIGHT);
 				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
@@ -496,13 +471,13 @@
 				textAlign(CENTER);
 			} 
 			else if (pageState === "duo") {
-				// Player 1 Column
+				// p1 col
 				fill(goldColor);
 				textAlign(RIGHT);
 				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
 				text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
 				
-				// Player 2 Column
+				// p2 col
 				fill(orangeColor);
 				textAlign(LEFT);
 				text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
@@ -511,14 +486,14 @@
 				textAlign(CENTER);
 			}
 			else if (pageState === "pvp") {
-				// Player 1
+				// p1
 				fill(goldColor);
 				textAlign(RIGHT);
 				text("P1 (WASD):", width / 2 - 40, height / 2 - 40);
 				text("Shoot: SHIFT", width / 2 - 40, height / 2 - 10);
 				
-				// Player 2
-				fill(orangeColor); // Or whatever color Ship 2 is!
+				// p2
+				fill(orangeColor);
 				textAlign(LEFT);
 				text(":P2 (ARROWS)", width / 2 + 40, height / 2 - 40);
 				text(":Shoot: PERIOD (.)", width / 2 + 40, height / 2 - 10);
@@ -532,7 +507,7 @@
 			text("ESC - Exit to Menu", width / 2, height / 2 + 220);
 		}
 
-		// Flicker Logic for the "Press Enter" prompt
+		// flicker animation
 		if (floor(millis() % 1000) < 500) {
 			textFont(texts);
 			fill(255);
@@ -540,12 +515,9 @@
 			text(subtitleText, width / 2, height / 1.4);
 		}
 	}
-	// shows HIGHSCORE POPUP and sound
-		let hsAnnounced = false; // Prevents the popup from triggering 60 times a second
-		let hsPopupTimer = 0;    // How long the message stays on screen
-
-	// other vars
-		let plusTenTimer = 0; // Tracks how long the +10 stays on screen
+		let hsAnnounced = false;
+		let hsPopupTimer = 0;
+		let plusTenTimer = 0;
 	
 
 // FOR solo.js
@@ -599,7 +571,7 @@
 // global.js
 
 function keyPressed() {
-    // --- TITLE ---
+    // title page
     if (pageState === "title") {
         if (keyCode === ENTER) {
             gameStartSound.play(); // Moved inside here!
@@ -612,19 +584,19 @@ function keyPressed() {
 	    }
 
 	    if (keyCode === 89 && stage === 2) { // 'Y' for Yes
-	        resetAllHighScores(); // Clears memory
+	        resetAllHighScores();
 	    	hsResetSound.play();
-	        resetHighScore = 120; // Sets timer to 2 seconds (at 60fps)
-	        isHSReset = true;     // <--- THE MISSING SWITCH!
-	        stage = 1;            // Go back to main title
+	        resetHighScore = 120;
+	        isHSReset = true;
+	        stage = 1;
 	    }
 
 	    if (keyCode === 78 && stage === 2) { // 'N' for No
 	    	keyPressSound.play();
-	        stage = 1; // Just go back without resetting
+	        stage = 1;
 	    }
     } 
-    // --- GAMEMODE ---
+    // gamemode
     else if (pageState === "gameMode") {
         if (keyCode === ESCAPE) {
         	keyPressSound.play();
@@ -646,7 +618,7 @@ function keyPressed() {
             pageState = "pvp";
         }
     } 
-    // --- SOLO ---
+    // solo
     else if (pageState === "solo") {
         if (keyCode === ESCAPE  && (paused === true || overState || !started ) ) {
         	keyPressSound.play();
@@ -659,11 +631,10 @@ function keyPressed() {
 
         handleSoloControls();
     }
-    // DUO
-    // --- DUO SECTION ---
+    // duo
     else if (pageState === "duo") {
         
-        // 1. START TRIGGER
+        // start
         if (!started && keyCode === ENTER) {
             keyPressSound.play();
 			if (!bgm.isPlaying()) {
@@ -674,7 +645,7 @@ function keyPressed() {
             return;
         }
 
-        // 2. PAUSE TRIGGER
+        // pause
         if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
             paused = !paused;
             keyPressSound.play();
@@ -683,7 +654,7 @@ function keyPressed() {
             return;
         }
 
-        // 3. EXIT TRIGGER (Esc)
+        // exit
         if (keyCode === ESCAPE && (paused || overState || !started)) {
             keyPressSound.play();
             pageState = "gameMode";
@@ -691,13 +662,11 @@ function keyPressed() {
             started = false;
         }
 
-        // 4. SHOOTING (Only if started and NOT paused)
+        // shooting
         if (started && !paused && !overState) {
             
-            // Check if the Triple-Shot powerup is active
             let isMulti = (multiShotActive && millis() < multiShotEndTime);
 
-            // Player 1: F
             if (keyCode === 70 && !ship1.isDead) {
                 if (isMulti) {
                     if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
@@ -710,7 +679,6 @@ function keyPressed() {
                 }
             }
             
-            // Player 2: Period (.)
             if (keyCode === 190 && !ship2.isDead) {
                 if (isMulti) {
                     if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
@@ -724,7 +692,7 @@ function keyPressed() {
             }
         }
 
-        // 5. RESTART TRIGGER
+        // reset
         if (keyCode === 82 && overState) {
             resetDuo();
         }

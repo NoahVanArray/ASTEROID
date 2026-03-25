@@ -24,7 +24,6 @@ function setupDuo() {
     ship1 = new Ship1(width/2 - 100, height/2, { up: 87, left: 65, right: 68 });
     ship2 = new Ship2(width/2 + 100, height/2, { up: 38, left: 37, right: 39 });
     
-    // Reset universal flags and arrays
     overState = false;
     started = false; 
     paused = false;
@@ -45,7 +44,6 @@ function setupDuo() {
     hsAnnounced = false; 
     hsPopupTimer = 0;
 
-    // Use your Solo spawn function!
     spawnAsteroids(60, 5);  // large
     spawnAsteroids(40, 8);  // medium
     spawnAsteroids(20, 10); // small
@@ -64,7 +62,7 @@ function drawDuo() {
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
-        // --- 1. TIMER & SCALING (Copied from Solo) ---
+        // timeer
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
@@ -75,7 +73,7 @@ function drawDuo() {
           lastDifficultyIncreaseTime = timer; 
         }
 
-        // --- 2. HIGH SCORE CHECK ---
+        // highscore
         if (timer > highScores.duo && !hsAnnounced && timer > 0) {
             updateHighScore('duo', timer); 
             hsAnnounced = true;
@@ -83,11 +81,11 @@ function drawDuo() {
             if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
         }
 
-        // --- 3. GAME UPDATES ---
+        // game update
         updateAllDuo();
         displayAllDuo();
 
-        // --- 4. HUD STYLING (Copied from Solo) ---
+        // scoring top
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -127,7 +125,7 @@ function drawDuo() {
         text("BEST: " + highScores.duo, width - 30, 30);
         pop();
 
-        // --- 5. HIGH SCORE POPUP (Copied from Solo) ---
+        // highscore popup
         if (hsPopupTimer > 0) {
           push();
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
@@ -144,7 +142,7 @@ function drawDuo() {
           pop();
         }
 
-        // --- 6. +10 SECONDS POPUP ---
+        // powerupinstant
         if (plusTenTimer > 0) {
             textSize(displayWidth / 110);
             textFont(headers);
@@ -154,18 +152,17 @@ function drawDuo() {
         }
     }
 
-    // 1. Spawn Alien (Same logic)
+    // aliean spawn
     if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
         aliens.push(new Alien());
     }
 
-    // 2. Update and Draw Aliens
+    // update alien
     for (let i = aliens.length - 1; i >= 0; i--) {
-        // IMPORTANT: Pass BOTH ships so the alien targets the closest one
         aliens[i].update([ship1, ship2]); 
         aliens[i].display();
 
-        // Check if ANY player laser hits the alien
+        // lasers to aliean
         for (let j = lasers.length - 1; j >= 0; j--) {
             if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
                 aliens.splice(i, 1);
@@ -176,12 +173,12 @@ function drawDuo() {
         }
     }
 
-    // 3. Update Alien Lasers
+    // alien lasers
     for (let i = alienLasers.length - 1; i >= 0; i--) {
         alienLasers[i].update();
         alienLasers[i].display();
 
-        // Check hit on Ship 1
+        // ship1 hit
         if (!ship1.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship1.pos.x, ship1.pos.y) < ship1.r) {
             ship1.isDead = true; 
             ship1.vel.mult(1.5); // Add a little "kick" to the wreck
@@ -189,7 +186,7 @@ function drawDuo() {
             continue; 
         }
 
-        // Check hit on Ship 2
+        // ship2 hit
         if (!ship2.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship2.pos.x, ship2.pos.y) < ship2.r) {
             ship2.isDead = true;
             ship2.vel.mult(1.5);
@@ -216,7 +213,7 @@ function updateAllDuo() {
         asteroid.update();
     }
 
-    // Powerup Spawning
+    // powerups
     if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
         powerups.push(new PowerupAsteroid());
         powerupSpawnTracker = timer;
@@ -226,7 +223,7 @@ function updateAllDuo() {
     }
 
     handleDuoCollisions(); 
-    checkLargeAsteroidRespawn(); // Borrows from solo.js naturally
+    checkLargeAsteroidRespawn();
 }
 
 function displayAllDuo() {
@@ -238,7 +235,7 @@ function displayAllDuo() {
 }
 
 function handleDuoCollisions() {
-    // Laser vs Asteroid (With sound)
+    // laser vs asteroid
     for (let i = lasers.length - 1; i >= 0; i--) {
         for (let j = asteroids.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y);
@@ -252,12 +249,12 @@ function handleDuoCollisions() {
         }
     }
 
-    // Laser vs Powerup
+    // laser vs powerup
     for (let i = lasers.length - 1; i >= 0; i--) {
         for (let j = powerups.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
             if (d < powerups[j].r) {
-                activatePowerup(); // Borrows from solo.js naturally
+                activatePowerup();
                 powerups.splice(j, 1);
                 lasers.splice(i, 1);
                 if (typeof powerUpSound !== 'undefined') powerUpSound.play();
@@ -266,7 +263,7 @@ function handleDuoCollisions() {
         }
     }
 
-    // Ship vs Asteroid (With Invincibility Check)
+    // ship vs asteroid
     if (shipInvincible) {
         if (millis() - shipInvincibleTime > currentInvincDuration) {
             shipInvincible = false;
@@ -274,12 +271,10 @@ function handleDuoCollisions() {
         }
     } else {
         for (let asteroid of asteroids) {
-            // Check Ship 1
             if (!ship1.isDead && ship1.hits(asteroid)) {
                 ship1.isDead = true;
                 ship1.vel.mult(1.5);
             }
-            // Check Ship 2
             if (!ship2.isDead && ship2.hits(asteroid)) {
                 ship2.isDead = true;
                 ship2.vel.mult(1.5);
@@ -287,7 +282,7 @@ function handleDuoCollisions() {
         }
     }
 
-    // Game Over Only If BOTH Are Dead
+    // gameover both dead
     if (ship1.isDead && ship2.isDead) {
         if (!overState) {
             bgm.stop();

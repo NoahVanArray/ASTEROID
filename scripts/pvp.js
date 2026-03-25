@@ -4,14 +4,14 @@ let pvpStarted = false;
 let pvpPaused = false;
 let pvpOver = false;
 
-// Life icons
+// life icons
 let p1LifeFull, p1LifeEmpty;
 let p2LifeFull, p2LifeEmpty;
 
-// Damage cooldowns to prevent instant death
+// damage cooldowns
 let p1HitTimer = 0;
 let p2HitTimer = 0;
-const HIT_COOLDOWN = 1000; // 1 second of invincibility after being hit
+const HIT_COOLDOWN = 1000;
 
 function preloadPvp() {
     ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
@@ -68,17 +68,15 @@ function drawPvp() {
         if (lasers[i]) lasers[i].display();
     }
     
-    // Blink ships if they were recently hit
+    // blink when hit
     if (ship1) {
         if (millis() < p1HitTimer + 1000 && frameCount % 10 < 5) {
-            // don't draw to create "blink" effect
         } else {
             ship1.display();
         }
     }
     if (ship2) {
         if (millis() < p2HitTimer + 1000 && frameCount % 10 < 5) {
-            // blink
         } else {
             ship2.display();
         }
@@ -103,7 +101,7 @@ function updatePvpLogic() {
     ship2.update();
     ship2.edges();
 
-    // 1. SHIP vs SHIP Bumping
+    // ship vs ship
     let dShips = dist(ship1.pos.x, ship1.pos.y, ship2.pos.x, ship2.pos.y);
     if (dShips < (ship1.size / 2) + (ship2.size / 2)) {
         let pushForce = p5.Vector.sub(ship1.pos, ship2.pos);
@@ -112,7 +110,7 @@ function updatePvpLogic() {
         ship2.vel.sub(pushForce);
     }
 
-    // 2. LASER LOGIC
+    // laser
     for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].update();
         
@@ -123,7 +121,7 @@ function updatePvpLogic() {
 
         let laserHitSomething = false;
 
-        // Laser vs Asteroids
+        // laser vs asteroid
         for (let j = asteroids.length - 1; j >= 0; j--) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y) < asteroids[j].r) {
                 splitAsteroid(asteroids[j]); 
@@ -144,7 +142,7 @@ function updatePvpLogic() {
             continue;
         }
 
-        // Laser vs Ship 1
+        // laser vs ship1
         if (lasers[i] instanceof Laser2 && millis() > p1HitTimer + HIT_COOLDOWN) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, ship1.pos.x, ship1.pos.y) < ship1.size / 2) {
                 ship1.lives--;
@@ -155,7 +153,7 @@ function updatePvpLogic() {
             }
         }
 
-        // Laser vs Ship 2
+        // lsaer vs ship2
         if (lasers[i] instanceof Laser1 && millis() > p2HitTimer + HIT_COOLDOWN) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, ship2.pos.x, ship2.pos.y) < ship2.size / 2) {
                 ship2.lives--;
@@ -167,7 +165,7 @@ function updatePvpLogic() {
         }
     }
 
-    // 3. ASTEROID LOGIC
+    // asteroid
     for (let i = asteroids.length - 1; i >= 0; i--) {
         asteroids[i].update();
         
@@ -176,7 +174,7 @@ function updatePvpLogic() {
         if (asteroids[i].pos.y > height + asteroids[i].r) asteroids[i].pos.y = -asteroids[i].r;
         else if (asteroids[i].pos.y < -asteroids[i].r) asteroids[i].pos.y = height + asteroids[i].r;
 
-        // Ship 1 vs Asteroid
+        // ship1 vs asteroid
         let d1 = dist(ship1.pos.x, ship1.pos.y, asteroids[i].pos.x, asteroids[i].pos.y);
         if (d1 < (ship1.size / 2) + asteroids[i].r) {
             if (millis() > p1HitTimer + HIT_COOLDOWN) {
@@ -192,7 +190,7 @@ function updatePvpLogic() {
             }
         }
 
-        // Ship 2 vs Asteroid
+        // ship2 vs asteroid
         let d2 = dist(ship2.pos.x, ship2.pos.y, asteroids[i].pos.x, asteroids[i].pos.y);
         if (d2 < (ship2.size / 2) + asteroids[i].r) {
             if (millis() > p2HitTimer + HIT_COOLDOWN) {
@@ -211,18 +209,17 @@ function updatePvpLogic() {
 }
 
 function checkPvpVictory() {
-    // Only trigger the win logic ONCE per round
     if (!pvpOver) {
         if (ship1.lives <= 0) {
             ship1.lives = 0;
             winner = "PLAYER 2";
-            addPvpWin(2); // Give P2 a point
+            addPvpWin(2);
             pvpOver = true;
             if (typeof pvpVictory !== 'undefined') pvpVictory.play();
         } else if (ship2.lives <= 0) {
             ship2.lives = 0;
             winner = "PLAYER 1";
-            addPvpWin(1); // Give P1 a point
+            addPvpWin(1);
             pvpOver = true;
             if (typeof pvpVictory !== 'undefined') pvpVictory.play();
         }
@@ -230,7 +227,6 @@ function checkPvpVictory() {
 }
 
 function drawPvpUi() {
-    // Draw the Hearts
     for (let i = 0; i < 3; i++) {
         let img1 = (i < Math.floor(ship1.lives)) ? p1LifeFull : p1LifeEmpty;
         if(img1) image(img1, 50 + (i * 45), 50, 35, 35);
@@ -239,28 +235,26 @@ function drawPvpUi() {
         if(img2) image(img2, width - 150 + (i * 45), 50, 35, 35);
     }
 
-    // Draw the Win Tracker Head-to-Head
     push();
     textFont(headers);
     
-    // "WINS" Header
+    // header wins
     fill(255);
     textSize(20);
     textAlign(CENTER, TOP);
     text("WINS", width / 2, 20);
 
-    // Player 1 Wins (Orange)
+    // p1 wins
     textSize(30);
     fill(orangeColor); 
     textAlign(RIGHT, TOP);
     text(highScores.pvpP1, width / 2 - 20, 50);
 
-    // Dash separator
     fill(255);
     textAlign(CENTER, TOP);
     text("-", width / 2, 50);
 
-    // Player 2 Wins (Blue)
+    // p2 wins
     fill("#52a1c8"); 
     textAlign(LEFT, TOP);
     text(highScores.pvpP2, width / 2 + 20, 50);
@@ -302,7 +296,7 @@ function handlePvpControls() {
             lasers.push(new Laser1(ship1.pos, ship1.angle));
             if (typeof laserSound !== 'undefined') laserSound.play();
         }
-        if (keyCode === 190) { // '.' key
+        if (keyCode === 190) {
             lasers.push(new Laser2(ship2.pos, ship2.angle));
             if (typeof laserSound !== 'undefined') laserSound.play();
         }

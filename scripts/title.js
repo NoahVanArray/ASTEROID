@@ -4,7 +4,6 @@ let isHSReset = false;
 function title() {
     textAlign(CENTER, CENTER);
 
-    // TITLE TEXT
     push();
     drawingContext.shadowColor = color(greenColor); 
     drawingContext.shadowBlur = 20;
@@ -40,7 +39,7 @@ function title() {
         text('press R to reset ALL High Score', 400, 500);
         pop();
 
-        if (isHSReset === true) { // Removed the redundant "&& stage === 1"
+        if (isHSReset === true) {
             if (resetHighScore > 0) {
                 push();
                 drawingContext.shadowColor = color(255, 50, 50, resetHighScore * 8); 
@@ -58,8 +57,8 @@ function title() {
                 }
                 pop();
             }
-        } // <--- Added this to close isHSReset
-    } // <--- Added this to close stage === 1
+        }
+    }
 
     if (stage === 2) {
         isHSReset = false;

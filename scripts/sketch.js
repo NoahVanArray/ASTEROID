@@ -83,14 +83,13 @@ function setup() {
     }
 }
 
-// 1. The logic for centering
+
 function centerCanvas() {
     let x = (windowWidth - width) / 2;
     let y = (windowHeight - height) / 2;
     cnv.position(x, y);
 }
 
-// 2. The magic trigger
 function windowResized() {
     centerCanvas();
 }
@@ -139,13 +138,13 @@ function draw() {
 function resetAllHighScores() {
     highScores.solo = 0;
     highScores.duo = 0;
-    highScores.pvpP1 = 0; // Reset P1
-    highScores.pvpP2 = 0; // Reset P2
+    highScores.pvpP1 = 0; // reset P1
+    highScores.pvpP2 = 0; // Rreset P2
 
     removeItem('soloHigh');
     removeItem('duoHigh');
-    removeItem('pvpP1Wins'); // Clear from local storage
-    removeItem('pvpP2Wins'); // Clear from local storage
+    removeItem('pvpP1Wins');
+    removeItem('pvpP2Wins');
 
     console.log("High Scores have been reset!");
 }

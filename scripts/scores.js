@@ -1,8 +1,8 @@
 let highScores = {
     solo: 0,
     duo: 0,
-    pvpP1: 0, // Tracks Player 1 wins
-    pvpP2: 0  // Tracks Player 2 wins
+    pvpP1: 0, 
+    pvpP2: 0 
 };
 
 function loadHighScores() {
@@ -19,7 +19,6 @@ function updateHighScore(mode, currentScore) {
     }
 }
 
-// New function specifically for PvP wins
 function addPvpWin(playerNum) {
     if (playerNum === 1) {
         highScores.pvpP1++;
