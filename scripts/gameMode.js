@@ -58,7 +58,7 @@ function gameMode(){
     textSize(14);
     text(`BEST: \n${highScores.solo}`, width1, scoreHeight);
     text(`BEST: \n${highScores.duo}`, width2, scoreHeight);
-    text(`BEST: \n${highScores.pvp}`, width3, scoreHeight); 
+    text(`WINS: \n${highScores.pvpP1} - ${highScores.pvpP2}`, width3, scoreHeight);
     
     textSize(18);
     textAlign(RIGHT, CENTER);

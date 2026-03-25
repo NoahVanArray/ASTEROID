@@ -211,29 +211,61 @@ function updatePvpLogic() {
 }
 
 function checkPvpVictory() {
-    if (ship1.lives <= 0) {
-        ship1.lives = 0;
-        winner = "PLAYER 2";
-        pvpOver = true;
-        pvpVictory.play();
-    } else if (ship2.lives <= 0) {
-        ship2.lives = 0;
-        winner = "PLAYER 1";
-        pvpOver = true;
-        pvpVictory.play();
+    // Only trigger the win logic ONCE per round
+    if (!pvpOver) {
+        if (ship1.lives <= 0) {
+            ship1.lives = 0;
+            winner = "PLAYER 2";
+            addPvpWin(2); // Give P2 a point
+            pvpOver = true;
+            if (typeof pvpVictory !== 'undefined') pvpVictory.play();
+        } else if (ship2.lives <= 0) {
+            ship2.lives = 0;
+            winner = "PLAYER 1";
+            addPvpWin(1); // Give P1 a point
+            pvpOver = true;
+            if (typeof pvpVictory !== 'undefined') pvpVictory.play();
+        }
     }
-
 }
 
 function drawPvpUi() {
+    // Draw the Hearts
     for (let i = 0; i < 3; i++) {
-        // Round to whole numbers for icons
         let img1 = (i < Math.floor(ship1.lives)) ? p1LifeFull : p1LifeEmpty;
         if(img1) image(img1, 50 + (i * 45), 50, 35, 35);
 
         let img2 = (i < Math.floor(ship2.lives)) ? p2LifeFull : p2LifeEmpty;
         if(img2) image(img2, width - 150 + (i * 45), 50, 35, 35);
     }
+
+    // Draw the Win Tracker Head-to-Head
+    push();
+    textFont(headers);
+    
+    // "WINS" Header
+    fill(255);
+    textSize(20);
+    textAlign(CENTER, TOP);
+    text("WINS", width / 2, 20);
+
+    // Player 1 Wins (Orange)
+    textSize(30);
+    fill(orangeColor); 
+    textAlign(RIGHT, TOP);
+    text(highScores.pvpP1, width / 2 - 20, 50);
+
+    // Dash separator
+    fill(255);
+    textAlign(CENTER, TOP);
+    text("-", width / 2, 50);
+
+    // Player 2 Wins (Blue)
+    fill("#52a1c8"); 
+    textAlign(LEFT, TOP);
+    text(highScores.pvpP2, width / 2 + 20, 50);
+    
+    pop();
 }
 
 function drawPvpWinnerOverlay() {

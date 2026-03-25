@@ -138,11 +138,13 @@ function draw() {
 function resetAllHighScores() {
     highScores.solo = 0;
     highScores.duo = 0;
-    highScores.pvp = 0;
+    highScores.pvpP1 = 0; // Reset P1
+    highScores.pvpP2 = 0; // Reset P2
 
     removeItem('soloHigh');
     removeItem('duoHigh');
-    removeItem('pvpHigh');
+    removeItem('pvpP1Wins'); // Clear from local storage
+    removeItem('pvpP2Wins'); // Clear from local storage
 
     console.log("High Scores have been reset!");
 }
