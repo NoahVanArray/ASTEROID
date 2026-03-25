@@ -542,6 +542,8 @@
 		let pauseStartTime = 0;
 
 		function drawOverlay(titleText, subtitleText, showControls) {
+			background(0,0,0,122);
+
 		    fill(0, 0, 0, 180); 
 		    rect(0, 0, width, height);
 
@@ -560,8 +562,6 @@
 		        textSize(20);
 		        
 		        if (pageState === "solo") {
-
-
 		        	push();
 			        drawingContext.shadowColor = color(goldColor); 
 			        drawingContext.shadowBlur = 20;
@@ -576,24 +576,43 @@
 		            text("F - Shoot", width / 2, height / 2 + 30);
 		            pop();
 		        } 
-		        else if (pageState === "duo") {
+		        else if (pageState === "duo" || pageState === "pvp") {
 		            // Player 1 Column
 		            
 		            textAlign(CENTER);
-		            textFont(headers);
-		            textSize(44);
-		            push();
-			        drawingContext.shadowColor = color(orangeColor); 
-			        drawingContext.shadowBlur = 20;
-		            fill(orangeColor);
-		        	text("DUO ", width / 2 - 85, 111);
-		        	pop();
-		        	push();
-			        drawingContext.shadowColor = color("#52a1c8"); 
-			        drawingContext.shadowBlur = 20;
-		            fill("#52a1c8");
-		        	text("MODE", width / 2 + 85, 111);
-		        	pop();
+
+		            if (pageState === "duo") {
+			            textFont(headers);
+			            textSize(44);
+			            push();
+				        drawingContext.shadowColor = color(orangeColor); 
+				        drawingContext.shadowBlur = 20;
+			            fill(orangeColor);
+			        	text("DUO ", width / 2 - 85, 111);
+			        	pop();
+
+			        	push();
+				        drawingContext.shadowColor = color("#52a1c8"); 
+				        drawingContext.shadowBlur = 20;
+			            fill("#52a1c8");
+			        	text("MODE", width / 2 + 85, 111);
+			        	pop();
+		            }
+
+		            else if (pageState === "pvp") {
+		            	textFont(headers);
+			            textSize(44);
+			            push();
+				        drawingContext.shadowColor = color(orangeColor); 
+				        drawingContext.shadowBlur = 20;
+			            fill(goldColor);
+			        	text("PVP MODE", width / 2, 111);
+			        	textSize(11);
+			        	text("Bumping Allowed :)", width / 2, 480);
+			        	pop();
+
+		            }
+
 		        	textFont(texts);
 		        	push();
 			        drawingContext.shadowColor = color(orangeColor); 

@@ -60,6 +60,8 @@ function resetPvp() {
 }
 
 function drawPvp() {
+    drawPvpUi();
+
     for (let i = 0; i < asteroids.length; i++) {
         if (asteroids[i]) asteroids[i].display();
     }
@@ -85,16 +87,15 @@ function drawPvp() {
     }
 
     if (!pvpStarted) {
-        drawOverlay("PVP MODE", "P1: WASD + F | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
+        drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
     } else if (pvpOver) {
         drawPvpWinnerOverlay();
     } else if (pvpPaused) {
-        drawOverlay("PAUSED", "Press P to Resume", false);
+        drawOverlay("PAUSED", "Press P to Resume", true);
     } else {
         updatePvpLogic();
     }
     
-    drawPvpUi();
 }
 
 function updatePvpLogic() {
@@ -238,7 +239,10 @@ function drawPvpUi() {
         let img2 = (i < Math.floor(ship2.lives)) ? p2LifeFull : p2LifeEmpty;
         if(img2) image(img2, width - 150 + (i * 45), 50, 35, 35);
     }
+    drawWins(20, 50);
+}
 
+function drawWins(h1, h2){
     // Draw the Win Tracker Head-to-Head
     push();
     textFont(headers);
@@ -247,42 +251,49 @@ function drawPvpUi() {
     fill(255);
     textSize(20);
     textAlign(CENTER, TOP);
-    text("WINS", width / 2, 20);
+    text("WINS", width / 2, h1);
 
     // Player 1 Wins (Orange)
     textSize(30);
     fill(orangeColor); 
     textAlign(RIGHT, TOP);
-    text(highScores.pvpP1, width / 2 - 20, 50);
+    text(highScores.pvpP1, width / 2 - 20, h2);
 
     // Dash separator
     fill(255);
     textAlign(CENTER, TOP);
-    text("-", width / 2, 50);
+    text("-", width / 2, h2);
 
     // Player 2 Wins (Blue)
     fill("#52a1c8"); 
     textAlign(LEFT, TOP);
-    text(highScores.pvpP2, width / 2 + 20, 50);
+    text(highScores.pvpP2, width / 2 + 20, h2);
     
     pop();
 }
 
 function drawPvpWinnerOverlay() {
-    fill(0, 180);
-    rect(0, 0, width, height);
-    textAlign(CENTER, CENTER);
+    background(0,0,0,144);
+
+    push();
     textFont(headers);
-    fill(255);
-    textSize(60);
-    text(winner + " WINS!", width/2, height/2 - 30);
-    
+    textAlign(CENTER, CENTER);
+    drawingContext.shadowColor = color(goldColor); 
+    drawingContext.shadowBlur = 20;
+    textSize(46); 
+    fill(goldColor);
+    textFont(headers);
+    text(winner + " WINS!", width / 2, height / 3);
+    pop();
+
+    drawWins(260, 290);
+
     textFont(texts);
     textSize(20);
     fill(greenColor);
-    text("REMATCH? (PRESS R)", width/2, height/2 + 60);
+    text("rematch? (r)", width/2, height/2 + 60);
     fill(redColor);
-    text("EXIT (ESC)", width/2, height/2 + 100);
+    text("exit (esc)", width/2, height/2 + 100);
 }
 
 function handlePvpControls() {

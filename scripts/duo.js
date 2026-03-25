@@ -61,7 +61,7 @@ function drawDuo() {
     } 
     else if (!started) {
         displayAllDuo(); 
-        drawOverlay("DUO MODE", "Press ENTER to Begin", true);
+        drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
     } 
     else if (paused) {
         displayAllDuo();
