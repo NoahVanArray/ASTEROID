@@ -2,19 +2,22 @@
 let ship1, ship2;
 
 function preloadDuo() {
-  ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
-  thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
-  lazerImg = loadImage('assets/graphics/bullets/laser1.png');
-  ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+    ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
+    thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
+    lazerImg = loadImage('assets/graphics/bullets/laser1.png');
+    ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
 
-  ship2Img = loadImage('assets/graphics/spaceships/ship2.png');
-  thrust2Img = loadImage('assets/graphics/spaceships/thrust2.png');
-  lazer2Img = loadImage('assets/graphics/bullets/laser2.png');
-  ship2Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+    ship2Img = loadImage('assets/graphics/spaceships/ship2.png');
+    thrust2Img = loadImage('assets/graphics/spaceships/thrust2.png');
+    lazer2Img = loadImage('assets/graphics/bullets/laser2.png');
+    ship2Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
 
-  largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
-  mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
-  smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+    largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
+    mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
+    smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+
+    alienImg = loadImage("assets/graphics/spaceships/alien3.png"); 
+    alienLaserImg = loadImage("assets/graphics/bullets/laser3.png");
 }
 
 function setupDuo() {
@@ -148,6 +151,54 @@ function drawDuo() {
             fill(255, 200, 0, plusTenTimer * 8); 
             text('+10!', 180, 50);
             plusTenTimer--;
+        }
+    }
+
+    // 1. Spawn Alien (Same logic)
+    if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
+        aliens.push(new Alien());
+    }
+
+    // 2. Update and Draw Aliens
+    for (let i = aliens.length - 1; i >= 0; i--) {
+        // IMPORTANT: Pass BOTH ships so the alien targets the closest one
+        aliens[i].update([ship1, ship2]); 
+        aliens[i].display();
+
+        // Check if ANY player laser hits the alien
+        for (let j = lasers.length - 1; j >= 0; j--) {
+            if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
+                aliens.splice(i, 1);
+                lasers.splice(j, 1);
+                if (typeof asteroidExplodeSound !== 'undefined') asteroidExplodeSound.play();
+                break;
+            }
+        }
+    }
+
+    // 3. Update Alien Lasers
+    for (let i = alienLasers.length - 1; i >= 0; i--) {
+        alienLasers[i].update();
+        alienLasers[i].display();
+
+        // Check hit on Ship 1
+        if (!ship1.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship1.pos.x, ship1.pos.y) < ship1.r) {
+            ship1.isDead = true; 
+            ship1.vel.mult(1.5); // Add a little "kick" to the wreck
+            alienLasers.splice(i, 1);
+            continue; 
+        }
+
+        // Check hit on Ship 2
+        if (!ship2.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship2.pos.x, ship2.pos.y) < ship2.r) {
+            ship2.isDead = true;
+            ship2.vel.mult(1.5);
+            alienLasers.splice(i, 1);
+            continue;
+        }
+
+        if (alienLasers[i].offscreen()) {
+            alienLasers.splice(i, 1);
         }
     }
 }

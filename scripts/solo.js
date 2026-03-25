@@ -11,12 +11,17 @@ function preloadSolo() {
     smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
 
     powerupAsteroidImg = loadImage("assets/graphics/asteroids/specialPower_2-NoBGpng.png");
+
+    alienImg = loadImage("assets/graphics/spaceships/alien3.png"); 
+    alienLaserImg = loadImage("assets/graphics/bullets/laser3.png");
 }
 
 function setupSolo() {
   
   // ship default spawn
   ship = new Ship1(width/2, height/2, { up: 87, left: 65, right: 68 });
+  aliens = []; 
+  alienLasers = [];
   
   // asteroid default spawn
   spawnAsteroids(60, 5);  // large
@@ -136,6 +141,43 @@ function drawSolo() {
 
     }
 
+    // 1. Randomly spawn an alien (e.g., 0.5% chance per frame)
+    if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
+        aliens.push(new Alien());
+    }
+
+    // 2. Update and Draw Aliens
+    for (let i = aliens.length - 1; i >= 0; i--) {
+        aliens[i].update([ship]); // Pass the single ship as target
+        aliens[i].display();
+
+        // Check if player's lasers hit the alien
+        for (let j = lasers.length - 1; j >= 0; j--) {
+            if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
+                aliens.splice(i, 1);
+                lasers.splice(j, 1);
+                // play explosion sound here
+                break;
+            }
+        }
+    }
+
+    // 3. Update Alien Lasers
+    for (let i = alienLasers.length - 1; i >= 0; i--) {
+        alienLasers[i].update();
+        alienLasers[i].display();
+
+        // Check if Alien laser hits player
+        if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < ship.r) {
+            ship.lives -= 1; // Or trigger your death logic
+            alienLasers.splice(i, 1);
+            continue;
+        }
+
+        if (alienLasers[i].offscreen()) {
+            alienLasers.splice(i, 1);
+        }
+    }
 }
 
 function updateAllSolo() {
