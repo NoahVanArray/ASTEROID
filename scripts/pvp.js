@@ -83,11 +83,7 @@ function drawPvp() {
     }
 
     if (!pvpStarted) {
-<<<<<<< HEAD
-        drawOverlay("PVP MODE", "Press ENTER to Start", true);
-=======
         drawOverlay("PVP MODE", "P1: WASD + F | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
     } else if (pvpOver) {
         drawPvpWinnerOverlay();
     } else if (pvpPaused) {
@@ -284,12 +280,6 @@ function drawPvpWinnerOverlay() {
 }
 
 function handlePvpControls() {
-<<<<<<< HEAD
-    if (!pvpStarted && keyCode === ENTER) {
-        pvpStarted = true;
-        if (!bgm.isPlaying()) {
-            bgm.loop();
-=======
     if (!pvpStarted) {
         
         if (keyCode === ENTER) {
@@ -300,7 +290,6 @@ function handlePvpControls() {
         if (keyCode === ESCAPE) {
             pageState = "gameMode";
             keyPressSound.play();
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         }
     }
 

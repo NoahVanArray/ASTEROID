@@ -398,7 +398,6 @@
 			}
 		}
 
-<<<<<<< HEAD
 		update() {
 			this.pos.add(this.vel);
 			this.edges();
@@ -414,7 +413,8 @@
 			}
 			pop();
 		}
-=======
+	}
+
 	class Alien {
 	    constructor() {
 	        let edge = floor(random(4));
@@ -433,12 +433,10 @@
 	        this.lastShotTime = millis();
 	        this.shootInterval = 2000;
 
-	        // Initialize rotation pointing toward center
 	        this.rotation = p5.Vector.sub(center, this.pos).heading();
 	    }
 
 	    update(targetShips) {
-	        // Don't do anything if already hit
 	        if (this.hitTime !== null) return;
 
 	        this.pos.add(this.vel);
@@ -448,7 +446,7 @@
 	        if (this.pos.y > height + this.r) this.pos.y = -this.r;
 	        if (this.pos.y < -this.r) this.pos.y = height + this.r;
 
-	        // Face the nearest living ship from targetShips
+	        // nearest ship to living ship
 	        let alive = targetShips.filter(s => s && !s.isDead);
 	        if (alive.length > 0) {
 	            let closest = alive.reduce((a, b) =>
@@ -493,15 +491,13 @@
 	        noTint();
 	        pop();
 	    }
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
 	}
 
 	class AlienLaser {
 	  constructor(pos, velocityVector) {
 	    this.pos = createVector(pos.x, pos.y);
-	    // FIX: Accept velocity vector directly instead of angle
 	    this.vel = velocityVector.copy();
-	    this.r = 15; // Increased hitbox so it doesn't artificially miss the player
+	    this.r = 15
 	  }
 
 	  update() {

@@ -41,23 +41,17 @@ function drawSolo() {
         displayAllSolo(); 
     } 
     else if (!started) {
-<<<<<<< HEAD
         // ready
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         displayAllSolo(); 
         drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
     } 
     else if (paused) {
-<<<<<<< HEAD
         // pause
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         displayAllSolo(); 
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
-        // --- GAME IS RUNNING ---
+        // statrt
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
@@ -70,10 +64,7 @@ function drawSolo() {
 
         if (timer > highScores.solo && !hsAnnounced && timer > 0) {
           updateHighScore('solo', timer); 
-<<<<<<< HEAD
           
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
           hsAnnounced = true;
           hsPopupTimer = 180;
           if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
@@ -82,15 +73,14 @@ function drawSolo() {
         updateAllSolo();
         displayAllSolo();
 
-        // ===== FIX #1: Only spawn if no aliens exist, and reset timer after death =====
+        // spawn when no aliens exist
         if (aliens.length === 0 && millis() - lastAlienSpawnTime > ALIEN_SPAWN_INTERVAL) {
             aliens.push(new Alien());
-            lastAlienSpawnTime = millis(); // Reset the timer after spawn
+            lastAlienSpawnTime = millis();
         }
 
-        // 2. Update and Draw Aliens
+        // ud alien
         for (let i = aliens.length - 1; i >= 0; i--) {
-            // Remove alien after 2 second flash
             if (aliens[i].hitTime !== null && millis() - aliens[i].hitTime > 800) {
                 aliens.splice(i, 1);
                 continue;
@@ -99,7 +89,7 @@ function drawSolo() {
             aliens[i].update([ship]); 
             aliens[i].display();
 
-            if (aliens[i].hitTime === null) { // Only check laser hits if not already hit
+            if (aliens[i].hitTime === null) { 
                 for (let j = lasers.length - 1; j >= 0; j--) {
                     if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
                         aliens[i].hitTime = millis();
@@ -110,12 +100,11 @@ function drawSolo() {
                 }
             }
         }
-        // 3. Update Alien Lasers & Check Player Hit
+        // aleien lasers
         for (let i = alienLasers.length - 1; i >= 0; i--) {
             alienLasers[i].update();
             alienLasers[i].display();
 
-            // FIXED: Used ship.size / 2 for the hitbox
             if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < (ship.size / 2) + alienLasers[i].r) {
                 if (typeof gameOverSound !== 'undefined') gameOverSound.play();
                 overState = true; 
@@ -128,7 +117,7 @@ function drawSolo() {
             }
         }
 
-        // UI Drawing
+        // ui
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -147,12 +136,7 @@ function drawSolo() {
         textFont(headers);
         text("TIME: " + timer, 30, 30);
         pop();
-<<<<<<< HEAD
         textSize(displayWidth / 110);
-=======
-        
-        textSize(displayWidth / 110); 
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         textAlign(RIGHT, TOP);
         noStroke();
 
@@ -170,18 +154,13 @@ function drawSolo() {
         if (hsPopupTimer > 0) {
           push();
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
-<<<<<<< HEAD
               
             drawingContext.shadowColor = color(57, 255, 20); 
-=======
-            drawingContext.shadowColor = color(57, 255, 20);
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
             drawingContext.shadowBlur = 20;
             fill(57, 255, 20);
             textSize(32);
             textAlign(CENTER);
             textFont(headers);
-<<<<<<< HEAD
             
             text("NEW HIGH SCORE!", width / 2, 100);
             
@@ -189,12 +168,6 @@ function drawSolo() {
           }
           
           hsPopupTimer--; 
-=======
-            text("NEW HIGH SCORE!", width / 2, 100);
-            highScores.solo = timer; 
-          }
-          hsPopupTimer--;
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
           pop();
         }
 
@@ -204,7 +177,6 @@ function drawSolo() {
             fill(255, 200, 0, plusTenTimer * 8); 
             text('+10!', 180, 50);
             plusTenTimer--;
-<<<<<<< HEAD
             
         }
 
@@ -244,8 +216,6 @@ function drawSolo() {
 
         if (alienLasers[i].offscreen()) {
             alienLasers.splice(i, 1);
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         }
     }
 }
@@ -367,18 +337,8 @@ function checkLargeAsteroidRespawn() {
   }
 }
 
-<<<<<<< HEAD
-
-
-
-
-
-
-function activatePowerup(p) {
-=======
 function activatePowerup() {
   let roll = floor(random(3));
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
   
   if (p.type === 0) {
     // skill 1: invincibility

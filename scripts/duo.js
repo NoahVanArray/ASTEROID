@@ -66,11 +66,7 @@ function drawDuo() {
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
-<<<<<<< HEAD
         // timeer
-=======
-        // --- GAME IS RUNNING ---
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
@@ -81,10 +77,7 @@ function drawDuo() {
           lastDifficultyIncreaseTime = timer; 
         }
 
-<<<<<<< HEAD
         // highscore
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (timer > highScores.duo && !hsAnnounced && timer > 0) {
             updateHighScore('duo', timer); 
             hsAnnounced = true;
@@ -92,13 +85,6 @@ function drawDuo() {
             if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
         }
 
-<<<<<<< HEAD
-        // game update
-        updateAllDuo();
-        displayAllDuo();
-
-        // scoring top
-=======
         updateAllDuo();
         displayAllDuo();
 
@@ -160,7 +146,6 @@ function drawDuo() {
         }
 
         // HUD STYLING
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -201,10 +186,7 @@ function drawDuo() {
         text("BEST: " + highScores.duo, width - 30, 30);
         pop();
 
-<<<<<<< HEAD
         // highscore popup
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (hsPopupTimer > 0) {
           push();
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
@@ -221,10 +203,7 @@ function drawDuo() {
           pop();
         }
 
-<<<<<<< HEAD
         // powerupinstant
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (plusTenTimer > 0) {
             textSize(displayWidth / 110);
             textFont(headers);
@@ -233,7 +212,6 @@ function drawDuo() {
             plusTenTimer--;
         }
     }
-<<<<<<< HEAD
 
     // aliean spawn
     if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
@@ -281,8 +259,6 @@ function drawDuo() {
             alienLasers.splice(i, 1);
         }
     }
-=======
->>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
 }
 
 function updateAllDuo() {
