@@ -20,6 +20,11 @@ function gameMode(){
 
     imageMode(CENTER)
 	textAlign(CENTER, CENTER);
+
+    push();
+    drawingContext.shadowColor = color(greenColor); 
+    drawingContext.shadowBlur = 20;
+
   	fill(greenColor);
     textFont(texts);
 	
@@ -43,14 +48,20 @@ function gameMode(){
     image(pvpMode, width3, imageHeight, imageSize, imageSize);
     textSize(14);
     text('(Press 3)\nPlay with an\nopponent. Shoot to kill.\nWhoever survives\nthe longest, wins.', width3, textHeight);
+    pop();
 
+    push();
+    drawingContext.shadowColor = color(goldColor); 
+    drawingContext.shadowBlur = 20;
+    
     fill(goldColor); 
     textSize(14);
     text(`BEST: \n${highScores.solo}`, width1, scoreHeight);
     text(`BEST: \n${highScores.duo}`, width2, scoreHeight);
-    text(`BEST: \n${highScores.pvp}`, width3, scoreHeight); 
+    text(`WINS: \n${highScores.pvpP1} - ${highScores.pvpP2}`, width3, scoreHeight);
     
     textSize(18);
     textAlign(RIGHT, CENTER);
     text('Back (esc).', 760, 560);
+    pop();
 }

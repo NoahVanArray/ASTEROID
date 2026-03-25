@@ -4,14 +4,14 @@ let pvpStarted = false;
 let pvpPaused = false;
 let pvpOver = false;
 
-// Life icons
+// life icons
 let p1LifeFull, p1LifeEmpty;
 let p2LifeFull, p2LifeEmpty;
 
-// Damage cooldowns to prevent instant death
+// damage cooldowns
 let p1HitTimer = 0;
 let p2HitTimer = 0;
-const HIT_COOLDOWN = 1000; // 1 second of invincibility after being hit
+const HIT_COOLDOWN = 1000;
 
 function preloadPvp() {
     ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
@@ -68,24 +68,22 @@ function drawPvp() {
         if (lasers[i]) lasers[i].display();
     }
     
-    // Blink ships if they were recently hit
+    // blink when hit
     if (ship1) {
         if (millis() < p1HitTimer + 1000 && frameCount % 10 < 5) {
-            // don't draw to create "blink" effect
         } else {
             ship1.display();
         }
     }
     if (ship2) {
         if (millis() < p2HitTimer + 1000 && frameCount % 10 < 5) {
-            // blink
         } else {
             ship2.display();
         }
     }
 
     if (!pvpStarted) {
-        drawOverlay("PVP MODE", "Press ENTER to Start", true);
+        drawOverlay("PVP MODE", "P1: WASD + F | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
     } else if (pvpOver) {
         drawPvpWinnerOverlay();
     } else if (pvpPaused) {
@@ -103,7 +101,7 @@ function updatePvpLogic() {
     ship2.update();
     ship2.edges();
 
-    // 1. SHIP vs SHIP Bumping
+    // ship vs ship
     let dShips = dist(ship1.pos.x, ship1.pos.y, ship2.pos.x, ship2.pos.y);
     if (dShips < (ship1.size / 2) + (ship2.size / 2)) {
         let pushForce = p5.Vector.sub(ship1.pos, ship2.pos);
@@ -112,7 +110,7 @@ function updatePvpLogic() {
         ship2.vel.sub(pushForce);
     }
 
-    // 2. LASER LOGIC
+    // laser
     for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].update();
         
@@ -123,7 +121,7 @@ function updatePvpLogic() {
 
         let laserHitSomething = false;
 
-        // Laser vs Asteroids
+        // laser vs asteroid
         for (let j = asteroids.length - 1; j >= 0; j--) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y) < asteroids[j].r) {
                 splitAsteroid(asteroids[j]); 
@@ -139,7 +137,12 @@ function updatePvpLogic() {
             continue;
         }
 
-        // Laser vs Ship 1
+        if (laserHitSomething) {
+            lasers.splice(i, 1);
+            continue;
+        }
+
+        // laser vs ship1
         if (lasers[i] instanceof Laser2 && millis() > p1HitTimer + HIT_COOLDOWN) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, ship1.pos.x, ship1.pos.y) < ship1.size / 2) {
                 ship1.lives--;
@@ -150,7 +153,7 @@ function updatePvpLogic() {
             }
         }
 
-        // Laser vs Ship 2
+        // lsaer vs ship2
         if (lasers[i] instanceof Laser1 && millis() > p2HitTimer + HIT_COOLDOWN) {
             if (dist(lasers[i].pos.x, lasers[i].pos.y, ship2.pos.x, ship2.pos.y) < ship2.size / 2) {
                 ship2.lives--;
@@ -162,7 +165,7 @@ function updatePvpLogic() {
         }
     }
 
-    // 3. ASTEROID LOGIC
+    // asteroid
     for (let i = asteroids.length - 1; i >= 0; i--) {
         asteroids[i].update();
         
@@ -171,7 +174,7 @@ function updatePvpLogic() {
         if (asteroids[i].pos.y > height + asteroids[i].r) asteroids[i].pos.y = -asteroids[i].r;
         else if (asteroids[i].pos.y < -asteroids[i].r) asteroids[i].pos.y = height + asteroids[i].r;
 
-        // Ship 1 vs Asteroid
+        // ship1 vs asteroid
         let d1 = dist(ship1.pos.x, ship1.pos.y, asteroids[i].pos.x, asteroids[i].pos.y);
         if (d1 < (ship1.size / 2) + asteroids[i].r) {
             if (millis() > p1HitTimer + HIT_COOLDOWN) {
@@ -187,7 +190,7 @@ function updatePvpLogic() {
             }
         }
 
-        // Ship 2 vs Asteroid
+        // ship2 vs asteroid
         let d2 = dist(ship2.pos.x, ship2.pos.y, asteroids[i].pos.x, asteroids[i].pos.y);
         if (d2 < (ship2.size / 2) + asteroids[i].r) {
             if (millis() > p2HitTimer + HIT_COOLDOWN) {
@@ -206,28 +209,57 @@ function updatePvpLogic() {
 }
 
 function checkPvpVictory() {
-    if (ship1.lives <= 0) {
-        bgm.stop();
-        ship1.lives = 0;
-        winner = "PLAYER 2";
-        pvpOver = true;
-    } else if (ship2.lives <= 0) {
-        bgm.stop();
-        ship2.lives = 0;
-        winner = "PLAYER 1";
-        pvpOver = true;
+    if (!pvpOver) {
+        if (ship1.lives <= 0) {
+            ship1.lives = 0;
+            winner = "PLAYER 2";
+            addPvpWin(2);
+            pvpOver = true;
+            if (typeof pvpVictory !== 'undefined') pvpVictory.play();
+        } else if (ship2.lives <= 0) {
+            ship2.lives = 0;
+            winner = "PLAYER 1";
+            addPvpWin(1);
+            pvpOver = true;
+            if (typeof pvpVictory !== 'undefined') pvpVictory.play();
+        }
     }
 }
 
 function drawPvpUi() {
     for (let i = 0; i < 3; i++) {
-        // Round to whole numbers for icons
         let img1 = (i < Math.floor(ship1.lives)) ? p1LifeFull : p1LifeEmpty;
         if(img1) image(img1, 50 + (i * 45), 50, 35, 35);
 
         let img2 = (i < Math.floor(ship2.lives)) ? p2LifeFull : p2LifeEmpty;
         if(img2) image(img2, width - 150 + (i * 45), 50, 35, 35);
     }
+
+    push();
+    textFont(headers);
+    
+    // header wins
+    fill(255);
+    textSize(20);
+    textAlign(CENTER, TOP);
+    text("WINS", width / 2, 20);
+
+    // p1 wins
+    textSize(30);
+    fill(orangeColor); 
+    textAlign(RIGHT, TOP);
+    text(highScores.pvpP1, width / 2 - 20, 50);
+
+    fill(255);
+    textAlign(CENTER, TOP);
+    text("-", width / 2, 50);
+
+    // p2 wins
+    fill("#52a1c8"); 
+    textAlign(LEFT, TOP);
+    text(highScores.pvpP2, width / 2 + 20, 50);
+    
+    pop();
 }
 
 function drawPvpWinnerOverlay() {
@@ -248,23 +280,37 @@ function drawPvpWinnerOverlay() {
 }
 
 function handlePvpControls() {
-    if (!pvpStarted && keyCode === ENTER) {
-        pvpStarted = true;
-        if (!bgm.isPlaying()) {
-            bgm.loop();
+    if (!pvpStarted) {
+        
+        if (keyCode === ENTER) {
+            pvpStarted = true;
+            keyPressSound.play();
+        }
+
+        if (keyCode === ESCAPE) {
+            pageState = "gameMode";
+            keyPressSound.play();
         }
     }
 
     if (pvpStarted && !pvpOver && (keyCode === 80 || key.toLowerCase() === 'p')) {
         pvpPaused = !pvpPaused;
+        keyPressSound.play();
+    }
+
+    if (pvpStarted && pvpPaused === true) {
+        if (keyCode === ESCAPE) {
+            pageState = "gameMode";
+            keyPressSound.play();
+        }
     }
 
     if (pvpStarted && !pvpPaused && !pvpOver) {
-        if (keyCode === SHIFT) {
+        if (keyCode === 70) { // F KEY
             lasers.push(new Laser1(ship1.pos, ship1.angle));
             if (typeof laserSound !== 'undefined') laserSound.play();
         }
-        if (keyCode === 190) { // '.' key
+        if (keyCode === 190) {
             lasers.push(new Laser2(ship2.pos, ship2.angle));
             if (typeof laserSound !== 'undefined') laserSound.play();
         }

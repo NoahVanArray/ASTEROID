@@ -1,5 +1,7 @@
 let stars = [];
 class Star {
+    
+
     constructor() {
         this.x = random(width);
         this.y = random(height);
@@ -8,9 +10,13 @@ class Star {
     }
 
     show() {
+        push();
+        drawingContext.shadowColor = color(244); 
+        drawingContext.shadowBlur = 20;
         noStroke();
         fill(244);
         ellipse(this.x, this.y, this.size);
+        pop();
     }
 
     update() {
@@ -21,4 +27,5 @@ class Star {
             this.y = random(height);
         }
     }
+    
 }
