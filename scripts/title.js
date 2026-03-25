@@ -1,6 +1,7 @@
 let stage = 1;
 let isHSReset = false;
 
+
 function title() {
     textAlign(CENTER, CENTER);
 

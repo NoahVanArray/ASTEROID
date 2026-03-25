@@ -44,7 +44,9 @@
 	let powerupSpawnTracker = 0;
 	let currentInvincDuration = 3000;
 
-	let lasers = [];
+	let ship1, ship2;
+	let lasers1 = [];
+	let lasers2 = [];
 	let asteroids = [];
 
 	// ship respawns
@@ -52,12 +54,12 @@
 	let shipInvincibleTime = 0;
 	const INVINCIBILITY_DURATION = 3000;
 
+	// asteroids variables
+	let smallAsteroid, largeAsteroid, mediumAsteroid, specialPowerAsteroid1, specialPowerAsteroid2;
+
 	// asteroid respawn
 	let largeAsteroidTimer = 0;
 	const LARGE_RESPAWN_DELAY = 10000;
-
-	// asteroids variables
-	let smallAsteroid, largeAsteroid, mediumAsteroid, specialPowerAsteroid1, specialPowerAsteroid2;
 
 	function resetGame() {
 	    overState = false;
@@ -76,7 +78,6 @@
 	    currentMenu = null; 
 	    loop(); 
 	}
-
 
 	function spawnAsteroids(size, count) {
 	  for (let i = 0; i < count; i++) {
@@ -653,9 +654,18 @@
 function keyPressed() {
     // title page
     if (pageState === "title") {
+// <<<<<<< HEAD
+//         if (keyCode === ENTER) pageState = "gameMode";
+//         if (keyCode === 82) stage = 2; // 'R' for Reset
+//         if (keyCode === 89 && stage === 2) { // 'Y' for Yes
+//             // resetAllHighScores();
+//             resetHighScore = 120;
+//             stage = 1;
+// =======
         if (keyCode === ENTER) {
             gameStartSound.play(); // Moved inside here!
             pageState = "gameMode";
+
         }
         
         if (keyCode === 82) { // 'R' for Reset

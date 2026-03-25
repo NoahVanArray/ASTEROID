@@ -1,3 +1,4 @@
+
 // duo.js
 let ship1, ship2;
 
@@ -264,12 +265,12 @@ function drawDuo() {
 function updateAllDuo() {
     ship1.update();
     ship2.update();
-
     for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].update();
         if (lasers[i].offScreen()) lasers.splice(i, 1);
     }
 
+    // Asteroids
     for (let asteroid of asteroids) {
         asteroid.update();
     }

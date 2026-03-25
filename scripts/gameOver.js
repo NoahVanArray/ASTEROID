@@ -34,6 +34,7 @@ function gameOver(){
     let displayHS = (pageState === "duo") ? highScores.duo : highScores.solo;
     
     text('HIGHEST SCORE: ' + displayHS, width / 2, height / 2);
+
     text('Your Score: ' + timer, width / 2, height / 2 + 40);
     pop();
     // other kemerut
