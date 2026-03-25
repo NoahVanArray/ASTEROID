@@ -59,6 +59,7 @@ function preload() {
 	gameOverSound = loadSound('assets/sounds/gameOver.wav');
 	gameStartSound = loadSound('assets/sounds/gameStart.wav');
 	keyPressSound = loadSound('assets/sounds/keyPress.wav');
+	bgm = loadSound('assets/sounds/ASTEROID.wav');
 	newHighScoreSound = loadSound('assets/sounds/newHighScore.wav');
 	addScorePowerUpSound = loadSound('assets/sounds/addScorePowerUp.wav');
 	hsResetSound = loadSound('assets/sounds/hsReset.wav');

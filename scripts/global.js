@@ -1,5 +1,6 @@
 // FOR sketch.js
 	let pageState = "title";
+	let bgm;
 
 	// text visibility timer for notifying user that high score is reset'd
     let resetHighScore = 0;
@@ -774,6 +775,9 @@ function keyPressed() {
     else if (pageState === "solo") {
         if (keyCode === ESCAPE  && (paused === true || overState || !started ) ) {
         	keyPressSound.play();
+			if (!bgm.isPlaying()) {
+				bgm.loop(); 
+			}
             pageState = "gameMode";
             overState = false;
         }
@@ -790,6 +794,9 @@ function keyPressed() {
         // 1. START TRIGGER
         if (!started && keyCode === ENTER) {
             keyPressSound.play();
+			if (!bgm.isPlaying()) {
+				bgm.loop(); 
+			}
             started = true;
             gameStartTime = millis();
             return;
@@ -852,6 +859,9 @@ function keyPressed() {
     }
 
     else if (pageState === "pvp") {
+		if (!bgm.isPlaying()) {
+				bgm.loop(); 
+			}
         handlePvpControls();
     }
 }
