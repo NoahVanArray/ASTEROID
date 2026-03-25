@@ -77,14 +77,14 @@ function drawSolo() {
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
         fill('#000000');
-        text("Score: " + timer, 33, 33);
+        text("TIME " + timer, 33, 33);
         pop();
         push();
         drawingContext.shadowColor = color('#39FF14'); 
         drawingContext.shadowBlur = 20;
         fill('#39FF14');
         textFont(headers);
-        text("Score: " + timer, 30, 30);
+        text("TIME: " + timer, 30, 30);
         pop();
         textSize(displayWidth / 110); // Keeping your same scale
         textAlign(RIGHT, TOP);
@@ -95,12 +95,12 @@ function drawSolo() {
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
         fill(0);
-        text("Best: " + highScores.solo, width - 33, 33);
+        text("BEST: " + highScores.solo, width - 33, 33);
         pop();
         // 2. Main Text (Neon Gold/Yellow looks great for a record)
         textFont(headers);
         fill(255, 200, 0); 
-        text("Best: " + highScores.solo, width - 30, 30);
+        text("BEST: " + highScores.solo, width - 30, 30);
 
         if (hsPopupTimer > 0) {
           push();

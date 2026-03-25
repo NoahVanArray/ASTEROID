@@ -96,7 +96,7 @@ function drawDuo() {
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
         fill('#000000');
-        text("Score: " + timer, 33, 33);
+        text("TIME: " + timer, 33, 33);
         pop();
 
         push();
@@ -104,7 +104,7 @@ function drawDuo() {
         drawingContext.shadowBlur = 20;
         fill('#39FF14');
         textFont(headers);
-        text("Score: " + timer, 30, 30);
+        text("TIME: " + timer, 30, 30);
         pop();
 
         textSize(displayWidth / 110); 
@@ -115,7 +115,7 @@ function drawDuo() {
         drawingContext.shadowColor = color(0); 
         drawingContext.shadowBlur = 20;
         fill(0);
-        text("Best: " + highScores.duo, width - 33, 33);
+        text("BEST: " + highScores.duo, width - 33, 33);
         textFont(headers);
         pop();
 
@@ -124,7 +124,7 @@ function drawDuo() {
         drawingContext.shadowBlur = 20;
         textFont(headers);
         fill(255, 200, 0); 
-        text("Best: " + highScores.duo, width - 30, 30);
+        text("BEST: " + highScores.duo, width - 30, 30);
         pop();
 
         // --- 5. HIGH SCORE POPUP (Copied from Solo) ---
