@@ -1,4 +1,3 @@
-
 // FOR sketch.js
 	let pageState = "title";
 	let bgm;
@@ -23,6 +22,9 @@
 	let alienImg, alienLaserImg;
 	let aliens = [];
 	let alienLasers = [];
+
+	let lastAlienSpawnTime = 0;
+	const ALIEN_SPAWN_INTERVAL = 10000; // 10,000 milliseconds = 10 seconds
 
 
 // FOR ALL MODES
@@ -396,6 +398,7 @@
 			}
 		}
 
+<<<<<<< HEAD
 		update() {
 			this.pos.add(this.vel);
 			this.edges();
@@ -411,13 +414,94 @@
 			}
 			pop();
 		}
+=======
+	class Alien {
+	    constructor() {
+	        let edge = floor(random(4));
+	        this.hitTime = null;
+	        if (edge === 0) this.pos = createVector(random(width), -40);
+	        else if (edge === 1) this.pos = createVector(random(width), height + 40);
+	        else if (edge === 2) this.pos = createVector(-40, random(height));
+	        else this.pos = createVector(width + 40, random(height));
+
+	        this.r = 25;
+
+	        let center = createVector(width / 2, height / 2);
+	        this.vel = p5.Vector.sub(center, this.pos).setMag(2);
+	        this.vel.rotate(random(-QUARTER_PI, QUARTER_PI));
+
+	        this.lastShotTime = millis();
+	        this.shootInterval = 2000;
+
+	        // Initialize rotation pointing toward center
+	        this.rotation = p5.Vector.sub(center, this.pos).heading();
+	    }
+
+	    update(targetShips) {
+	        // Don't do anything if already hit
+	        if (this.hitTime !== null) return;
+
+	        this.pos.add(this.vel);
+
+	        if (this.pos.x > width + this.r) this.pos.x = -this.r;
+	        if (this.pos.x < -this.r) this.pos.x = width + this.r;
+	        if (this.pos.y > height + this.r) this.pos.y = -this.r;
+	        if (this.pos.y < -this.r) this.pos.y = height + this.r;
+
+	        // Face the nearest living ship from targetShips
+	        let alive = targetShips.filter(s => s && !s.isDead);
+	        if (alive.length > 0) {
+	            let closest = alive.reduce((a, b) =>
+	                dist(this.pos.x, this.pos.y, a.pos.x, a.pos.y) <
+	                dist(this.pos.x, this.pos.y, b.pos.x, b.pos.y) ? a : b
+	            );
+	            this.rotation = p5.Vector.sub(closest.pos, this.pos).heading();
+	        }
+
+	        if (millis() - this.lastShotTime > this.shootInterval) {
+	            this.shoot(targetShips);
+	            this.lastShotTime = millis();
+	        }
+	    }
+
+	    shoot(targetShips) {
+	        let alive = targetShips.filter(s => s && !s.isDead);
+	        if (alive.length > 0) {
+	            let selectedTarget = random(alive);
+	            let targetVector = p5.Vector.sub(selectedTarget.pos, this.pos);
+	            targetVector.setMag(5);
+	            alienLasers.push(new AlienLaser(this.pos, targetVector));
+	        }
+	    }
+
+	    display() {
+	        push();
+	        imageMode(CENTER);
+	        translate(this.pos.x, this.pos.y);
+	        rotate(this.rotation + HALF_PI);
+
+	        if (this.hitTime !== null) {
+	            let elapsed = millis() - this.hitTime;
+	            if (floor(elapsed / 100) % 2 === 0) {
+	                tint(255, 50, 50);
+	            } else {
+	                tint(255);
+	            }
+	        }
+
+	        image(alienImg, 0, 0, this.r * 2.3, this.r * 2.3);
+	        noTint();
+	        pop();
+	    }
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
 	}
 
 	class AlienLaser {
-	  constructor(pos, angle) {
+	  constructor(pos, velocityVector) {
 	    this.pos = createVector(pos.x, pos.y);
-	    this.vel = p5.Vector.fromAngle(angle).mult(5);
-	    this.r = 6;
+	    // FIX: Accept velocity vector directly instead of angle
+	    this.vel = velocityVector.copy();
+	    this.r = 15; // Increased hitbox so it doesn't artificially miss the player
 	  }
 
 	  update() {
@@ -429,7 +513,7 @@
 	    imageMode(CENTER);
 	    translate(this.pos.x, this.pos.y);
 	    rotate(this.vel.heading() + HALF_PI);
-	    image(alienLaserImg, 0, 0, 20, 40);
+	    image(alienLaserImg, 0, 0, 50, 80);
 	    pop();
 	  }
 

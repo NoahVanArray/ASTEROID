@@ -18,6 +18,7 @@ function preloadDuo() {
 
     alienImg = loadImage("assets/graphics/spaceships/alien3.png"); 
     alienLaserImg = loadImage("assets/graphics/bullets/laser3.png");
+    lastAlienSpawnTime = millis();
 }
 
 function setupDuo() {
@@ -30,6 +31,9 @@ function setupDuo() {
     
     asteroids = [];
     lasers = [];
+    aliens = []; // ===== FIX: Clear aliens array =====
+    alienLasers = []; // ===== FIX: Clear alien lasers array =====
+    
     powerups = [];
     
     multiShotActive = false;
@@ -62,7 +66,11 @@ function drawDuo() {
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
+<<<<<<< HEAD
         // timeer
+=======
+        // --- GAME IS RUNNING ---
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
@@ -73,7 +81,10 @@ function drawDuo() {
           lastDifficultyIncreaseTime = timer; 
         }
 
+<<<<<<< HEAD
         // highscore
+=======
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (timer > highScores.duo && !hsAnnounced && timer > 0) {
             updateHighScore('duo', timer); 
             hsAnnounced = true;
@@ -81,15 +92,80 @@ function drawDuo() {
             if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
         }
 
+<<<<<<< HEAD
         // game update
         updateAllDuo();
         displayAllDuo();
 
         // scoring top
+=======
+        updateAllDuo();
+        displayAllDuo();
+
+        // ===== FIX #1: Only spawn if no aliens exist, and reset timer after death =====
+        if (aliens.length === 0 && millis() - lastAlienSpawnTime > ALIEN_SPAWN_INTERVAL) {
+            aliens.push(new Alien());
+            lastAlienSpawnTime = millis(); // Reset the timer after spawn
+        }
+
+        // 2. Update and Draw Aliens
+        for (let i = aliens.length - 1; i >= 0; i--) {
+            // Remove alien after 2 second flash
+            if (aliens[i].hitTime !== null && millis() - aliens[i].hitTime > 800) {
+                aliens.splice(i, 1);
+                continue;
+            }
+
+            aliens[i].update([ship1, ship2]); 
+            aliens[i].display();
+
+            if (aliens[i].hitTime === null) { // Only check laser hits if not already hit
+                for (let j = lasers.length - 1; j >= 0; j--) {
+                    if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
+                        aliens[i].hitTime = millis();
+                        lasers.splice(j, 1);
+                        if (typeof asteroidSound !== 'undefined') asteroidSound.play();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 3. Update Alien Lasers & Check Player Hit
+        for (let i = alienLasers.length - 1; i >= 0; i--) {
+            alienLasers[i].update();
+            alienLasers[i].display();
+
+            // Check hit on Ship 1 (Using ship1.size / 2)
+            if (!shipInvincible && !ship1.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship1.pos.x, ship1.pos.y) < (ship1.size / 2) + alienLasers[i].r) {
+                ship1.isDead = true; 
+                ship1.vel.mult(1.5); 
+                alienLasers.splice(i, 1);
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play(); // Crunch sound on hit
+                continue; 
+            }
+
+            // Check hit on Ship 2 (Using ship2.size / 2)
+            if (!shipInvincible && !ship2.isDead && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship2.pos.x, ship2.pos.y) < (ship2.size / 2) + alienLasers[i].r) {
+                ship2.isDead = true;
+                ship2.vel.mult(1.5);
+                alienLasers.splice(i, 1);
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play(); // Crunch sound on hit
+                continue;
+            }
+
+            if (alienLasers[i].offscreen()) {
+                alienLasers.splice(i, 1);
+            }
+        }
+
+        // HUD STYLING
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
         strokeWeight(3);
+        
         push();
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
@@ -125,7 +201,10 @@ function drawDuo() {
         text("BEST: " + highScores.duo, width - 30, 30);
         pop();
 
+<<<<<<< HEAD
         // highscore popup
+=======
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (hsPopupTimer > 0) {
           push();
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
@@ -142,7 +221,10 @@ function drawDuo() {
           pop();
         }
 
+<<<<<<< HEAD
         // powerupinstant
+=======
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
         if (plusTenTimer > 0) {
             textSize(displayWidth / 110);
             textFont(headers);
@@ -151,6 +233,7 @@ function drawDuo() {
             plusTenTimer--;
         }
     }
+<<<<<<< HEAD
 
     // aliean spawn
     if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
@@ -198,6 +281,8 @@ function drawDuo() {
             alienLasers.splice(i, 1);
         }
     }
+=======
+>>>>>>> 50a8e65e4e7717fdf0524b263203da09772f588a
 }
 
 function updateAllDuo() {
@@ -232,6 +317,8 @@ function displayAllDuo() {
     for (let l of lasers) l.display();
     for (let a of asteroids) a.display();
     for (let p of powerups) p.display();
+    for (let al of aliens) al.display();
+    for (let al of alienLasers) al.display();
 }
 
 function handleDuoCollisions() {
@@ -297,4 +384,5 @@ function resetDuo() {
     setupDuo(); 
     gameStartTime = millis();
     pausedTime = 0;
+    lastAlienSpawnTime = millis(); // ===== FIX: Reset alien spawn timer =====
 }
