@@ -15,6 +15,14 @@
 		- Death					Ongoing
 		- Asteroids 	    	DONE
 		- Powerups				Ongoing
+	- Sounds:
+		- Laser Shots			Ongoing 1
+		- Asteroid Broken		Ongoing 1
+		- Power Up 				Ongoing 1 
+		- Key Press				Ongoing 1
+		- GameOver				Ongoing 1
+		- Victory (for 2P)		----
+		- Highscore 			Ongoing 1
 	- Game Modes: 				
 		- Solo					Ongoing
 		- Duo 					----
@@ -26,7 +34,6 @@
 				- bgm 
 				
 			Yoe:
-				- blinking phase transition
 				- sfx
 
 
@@ -39,9 +46,23 @@
 
 function preload() {
 	// load all gameMode preloads here
-	preloadSolo();	
 	preloadGameMode();
+	preloadSolo();	
+	preloadDuo();
+	preloadPvp();
 
+	// sounds here
+	laserSound = loadSound('assets/sounds/short laser shot 1.wav');
+	upgradedLaserSound = loadSound('assets/sounds/short laser shot 1 upg.wav');
+	asteroidSound = loadSound('assets/sounds/crushingRocks1Edited.wav');
+	powerUpSound = loadSound('assets/sounds/powerUp.wav');
+	gameOverSound = loadSound('assets/sounds/gameOver.wav');
+	gameStartSound = loadSound('assets/sounds/gameStart.wav');
+	keyPressSound = loadSound('assets/sounds/keyPress.wav');
+	newHighScoreSound = loadSound('assets/sounds/newHighScore.wav');
+	addScorePowerUpSound = loadSound('assets/sounds/addScorePowerUp.wav');
+	hsResetSound = loadSound('assets/sounds/hsReset.wav');
+	bgm = loadSound('assets/sounds/ASTEROID.wav');
 }
 
 function setup() {
@@ -49,6 +70,9 @@ function setup() {
 	setupGlobal();
 	// load all gameMode setups here
   	setupSolo();
+  	setupDuo();
+  	setupPvp();
+
   	
 	let cnv = createCanvas(800, 600);
 	cnv.style('display', 'block');
@@ -83,10 +107,10 @@ function draw() {
 		drawDuo();
 	}
 	else if (pageState === "pvp"){
-		// pvp();
+		drawPvp();
 	} 	
 	// REMINDER: over/gameOver IS NOT a state, bruh
-	if (over === true){
+	if (overState === true){
 		gameOver();
 	}
 

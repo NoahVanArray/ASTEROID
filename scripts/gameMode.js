@@ -1,8 +1,8 @@
 
 function preloadGameMode(){
-    soloMode = loadImage(soloModeBase64);
-    duoMode = loadImage(duoModeBase64);
-    pvpMode = loadImage(pvpModeBase64);
+    soloMode = loadImage('assets/graphics/modes/soloMode.png');
+    duoMode = loadImage('assets/graphics/modes/duoMode.png');
+    pvpMode = loadImage('assets/graphics/modes/pvpMode.png');
 }
 // le gamemode
 function gameMode(){

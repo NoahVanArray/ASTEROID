@@ -1,67 +1,91 @@
 
-function preloadDuo() {
-  ship1Img = loadImage(ship1b64);
-  ship2Img = loadImage(ship2b64);
-  thrust1Img = loadImage(thrust1b64);
-  thrust2Img = loadImage(thrust2b64);
-  lazerImg = loadImage(laser2b64);
-  lazer2Img = loadImage(lazer2b64);
-  ship1Invincibility = loadImage(shipInvincibilityb64);
-  shipNoLife = loadImage(ship1NoLifeb64);
+// duo.js
+let ship1, ship2;
 
-  largeAsteroid = loadImage(lg_asteroidb64);
-  mediumAsteroid = loadImage(md_asteroidb64);
-  smallAsteroid = loadImage(sm_asteroidb64);
+function preloadDuo() {
+  ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
+  thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
+  lazerImg = loadImage('assets/graphics/bullets/laser1.png');
+  ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+
+  ship2Img = loadImage('assets/graphics/spaceships/ship2.png');
+  thrust2Img = loadImage('assets/graphics/spaceships/thrust2.png');
+  lazer2Img = loadImage('assets/graphics/bullets/laser2.png');
+  ship2Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+
+  largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
+  mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
+  smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
 }
 
 function setupDuo() {
-  
-  // ship default spawn
-  ship1 = new Ship(width / 2 - 50, height / 2, {up: 87,left: 65,right: 68,fire: 16}, lazerImg1);
-  ship2 = new Ship(width / 2 + 50, height / 2, {up: UP_ARROW,left: LEFT_ARROW,right: RIGHT_ARROW,fire: 32}, lazerImg2);
-  
-  // asteroid default spawn
-  spawnAsteroids(60, 5);  // large
-  spawnAsteroids(40, 8);  // medium
-  spawnAsteroids(20, 10); // small
+    ship1 = new Ship1(width/2 - 100, height/2, { up: 87, left: 65, right: 68 });
+    ship2 = new Ship2(width/2 + 100, height/2, { up: 38, left: 37, right: 39 });
+    
+    // Reset universal flags and arrays
+    overState = false;
+    started = false; 
+    paused = false;
+    
+    asteroids = [];
+    lasers = [];
+    powerups = [];
+    
+    multiShotActive = false;
+    multiShotEndTime = 0;
+    powerupSpawnTracker = 0;
+    currentInvincDuration = 3000;
+
+    timer = 0;
+    pausedTime = 0;
+    lastDifficultyIncreaseTime = 0;
+    
+    hsAnnounced = false; 
+    hsPopupTimer = 0;
+
+    // Use your Solo spawn function!
+    spawnAsteroids(60, 5);  // large
+    spawnAsteroids(40, 8);  // medium
+    spawnAsteroids(20, 10); // small
 }
 
-
 function drawDuo() {
-    if (over === true) {
-        displayAllDuo(); // Keep the graveyard visible
-        // You can add your Game Over text here later
+    if (overState === true) {
+        displayAllDuo(); 
     } 
     else if (!started) {
-        // --- READY SCREEN ---
-        displayAllDuo(); // Show ship/asteroids frozen in place
-        drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
+        displayAllDuo(); 
+        drawOverlay("DUO MODE", "Press ENTER to Begin", true);
     } 
     else if (paused) {
-        // --- PAUSE SCREEN ---
-        displayAllDuo(); 
-        drawOverlay("PAUSED", "Press P to Resume", false);
+        displayAllDuo();
+        drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
-        // --- ACTIVE GAMEPLAY ---
-        
-        // 1. Timer Calculation (Subtracting time spent paused)
+        // --- 1. TIMER & SCALING (Copied from Solo) ---
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
-        // 2. Difficulty Scaling (Your logic)
         if (timer > 0 && timer % 30 === 0 && timer !== lastDifficultyIncreaseTime) {
-            spawnAsteroids(20, 10);
-            spawnAsteroids(60, 2); 
-            spawnAsteroids(40, 3); 
-            lastDifficultyIncreaseTime = timer; 
+          spawnAsteroids(20, 10);
+          spawnAsteroids(60, 2); 
+          spawnAsteroids(40, 3); 
+          lastDifficultyIncreaseTime = timer; 
         }
 
-        // 3. Update & Display Everything
-        updateAllDUo();
+        // --- 2. HIGH SCORE CHECK ---
+        if (timer > highScores.duo && !hsAnnounced && timer > 0) {
+            updateHighScore('duo', timer); 
+            hsAnnounced = true;
+            hsPopupTimer = 180;
+            if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
+        }
+
+        // --- 3. GAME UPDATES ---
+        updateAllDuo();
         displayAllDuo();
 
-        // 4. Draw the Timer UI (Your specific style)
+        // --- 4. HUD STYLING (Copied from Solo) ---
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -71,16 +95,47 @@ function drawDuo() {
         fill('#39FF14');
         textFont(headers);
         text("Score: " + timer, 30, 30);
-    }
 
+        textSize(displayWidth / 110); 
+        textAlign(RIGHT, TOP);
+        noStroke();
+        fill(0);
+        text("Best: " + highScores.duo, width - 33, 33);
+        textFont(headers);
+        fill(255, 200, 0); 
+        text("Best: " + highScores.duo, width - 30, 30);
+
+        // --- 5. HIGH SCORE POPUP (Copied from Solo) ---
+        if (hsPopupTimer > 0) {
+          push();
+          if (floor(hsPopupTimer / 10) % 2 === 0) { 
+            drawingContext.shadowColor = color(57, 255, 20); 
+            drawingContext.shadowBlur = 20;
+            fill(57, 255, 20);
+            textSize(32);
+            textAlign(CENTER);
+            textFont(headers);
+            text("NEW HIGH SCORE!", width / 2, 100);
+            highScores.duo = timer; 
+          }
+          hsPopupTimer--; 
+          pop();
+        }
+
+        // --- 6. +10 SECONDS POPUP ---
+        if (plusTenTimer > 0) {
+            textSize(displayWidth / 110);
+            textFont(headers);
+            fill(255, 200, 0, plusTenTimer * 8); 
+            text('+10!', 180, 50);
+            plusTenTimer--;
+        }
+    }
 }
 
 function updateAllDuo() {
-    // Ship
     ship1.update();
     ship2.update();
-
-    // Lasers
     for (let i = lasers.length - 1; i >= 0; i--) {
         lasers[i].update();
         if (lasers[i].offScreen()) lasers.splice(i, 1);
@@ -91,7 +146,7 @@ function updateAllDuo() {
         asteroid.update();
     }
 
-    // Powerups (Finals addition)
+    // Powerup Spawning
     if (timer > 0 && timer % 30 === 0 && timer !== powerupSpawnTracker) {
         powerups.push(new PowerupAsteroid());
         powerupSpawnTracker = timer;
@@ -100,11 +155,8 @@ function updateAllDuo() {
         p.update();
     }
 
-    // --- ALL COLLISION LOGIC ---
-    handleCollisions(); 
-
-    checkLargeAsteroidRespawn();
-    checkShipAsteroidCollision();
+    handleDuoCollisions(); 
+    checkLargeAsteroidRespawn(); // Borrows from solo.js naturally
 }
 
 function displayAllDuo() {
@@ -115,8 +167,8 @@ function displayAllDuo() {
     for (let p of powerups) p.display();
 }
 
-function handleCollisions() {
-    // Laser vs Asteroid
+function handleDuoCollisions() {
+    // Laser vs Asteroid (With sound)
     for (let i = lasers.length - 1; i >= 0; i--) {
         for (let j = asteroids.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, asteroids[j].pos.x, asteroids[j].pos.y);
@@ -124,6 +176,7 @@ function handleCollisions() {
                 splitAsteroid(asteroids[j]);
                 asteroids.splice(j, 1);
                 lasers.splice(i, 1);
+                if (typeof asteroidSound !== 'undefined') asteroidSound.play();
                 break; 
             }
         }
@@ -134,358 +187,49 @@ function handleCollisions() {
         for (let j = powerups.length - 1; j >= 0; j--) {
             let d = dist(lasers[i].pos.x, lasers[i].pos.y, powerups[j].pos.x, powerups[j].pos.y);
             if (d < powerups[j].r) {
-                activatePowerup(); 
+                activatePowerup(); // Borrows from solo.js naturally
                 powerups.splice(j, 1);
                 lasers.splice(i, 1);
+                if (typeof powerUpSound !== 'undefined') powerUpSound.play();
                 break;
             }
         }
     }
-}
 
-function spawnAsteroids(size, count) {
-  for (let i = 0; i < count; i++) {
-    asteroids.push(new Asteroid(null, size));
-  }
-}
-
-function splitAsteroid(asteroid) {
-  let pieces = 3;
-  let newSize;
-
-  if (asteroid.r === 60) {
-    newSize = 40; // large to medium
-  } else if (asteroid.r === 40) {
-    newSize = 20; // medium to small
-  } else {
-    return; // small asteroid: no split
-  }
-
-  for (let i = 0; i < pieces; i++) {
-    let newPos = asteroid.pos.copy();
-    let newAsteroid = new Asteroid(newPos, newSize);
-
-    asteroids.push(newAsteroid);
-  }
-}
-
-function checkShipAsteroidCollision() {
-	updateHighScore('duo', timer);
-
-  	if (shipInvincible) {
-    	if (millis() - shipInvincibleTime > currentInvincDuration) {
-      	shipInvincible = false;
-        currentInvincDuration = 3000;
-    	}
-    	return;
-  	}
-
-    let players = [ship1, ship2]; 
-    for (let s of players) {
-        for (let asteroid of asteroids) {
-            let d = dist(s.pos.x, s.pos.y, asteroid.pos.x, asteroid.pos.y);
-            if (d < asteroid.r + s.size / 2) {
-                over = true;
-                return;
-            }
-        }
-    }
-
-    for (let asteroid of asteroids) {
-        let d = dist(
-        ship.pos.x,
-        ship.pos.y,
-        asteroid.pos.x,
-        asteroid.pos.y
-        );
-
-    if (d < asteroid.r + ship.size / 2) {
-      
-      over = true;
-      timer = timer;
-      // ship.respawn();
-      break;
-    }
-  }
-}
-
-function checkLargeAsteroidRespawn() {
-  let largeCount = asteroids.filter(a => a.r === 60).length;
-
-  if (largeCount === 0) {
-    if (largeAsteroidTimer === 0) {
-      largeAsteroidTimer = millis();
-    }
-
-    if (millis() - largeAsteroidTimer > LARGE_RESPAWN_DELAY) {
-      spawnAsteroids(60, 5); // respawn 5 large
-      largeAsteroidTimer = 0;
-    }
-  } else {
-    // reset timer if even ONE large asteroids exists
-    largeAsteroidTimer = 0;
-  }
-}
-
-
-
-class Ship {
-  constructor(x, y, controls, laserImg) {
-    this.pos = createVector(x, y);
-    this.vel = createVector(0, 0);
-    this.angle = 0;
-    this.drag = 0.99;
-    this.size = 40;
-    this.isThrusting = false;
-    this.controls = controls;
-    this.laserImg = laserImg; 
-  }
-
-  update() {
-    if (over === false) {
-      if (keyIsDown(this.controls.left)) this.angle -= 0.08;
-      if (keyIsDown(this.controls.right)) this.angle += 0.08;
-      
-      this.isThrusting = keyIsDown(this.controls.up);
-      if (this.isThrusting) {
-        let force = p5.Vector.fromAngle(this.angle);
-        force.mult(0.2);
-        this.vel.add(force);
-      }
-    }
-
-    this.vel.mult(this.drag);
-    this.pos.add(this.vel);
-
-    if (this.pos.x > width) this.pos.x = 0;
-    if (this.pos.x < 0) this.pos.x = width;
-    if (this.pos.y > height) this.pos.y = 0;
-    if (this.pos.y < 0) this.pos.y = height;
-  }
-  
-  fire() {
-    return new Laser(this.pos, this.angle, this.laserImg);
-    }
-
-  display() {
+    // Ship vs Asteroid (With Invincibility Check)
     if (shipInvincible) {
-        if (floor(millis() % 200) < 100) {
-        return; 
+        if (millis() - shipInvincibleTime > currentInvincDuration) {
+            shipInvincible = false;
+            currentInvincDuration = 3000;
         }
-    }
-
-    let currentImg = this.isThrusting ? (over ? ship1Img : thrust1Img): ship1Img;
-    push();
-        translate(this.pos.x, this.pos.y);
-        rotate(this.angle + HALF_PI);
-        imageMode(CENTER);
-        image(currentImg, 0, 0, this.size, this.size);
-    pop();
-    }
-
-  respawn() {
-    this.pos = createVector(random(width), random(height));
-    this.vel.set(0, 0);
-    this.angle = 0;
-
-    shipInvincible = true;
-    shipInvincibleTime = millis();
-  }
-}
-
-
-
-class Laser {
-  constructor(shipPos, shipAngle, img) {
-    this.pos = createVector(shipPos.x, shipPos.y);
-    this.vel = p5.Vector.fromAngle(shipAngle);
-    this.vel.mult(10);
-    this.angle = shipAngle;
-    this.img = img;
-  }
-   update() {
-    this.pos.add(this.vel);
-  }
-
-  display() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.angle + HALF_PI);
-    imageMode(CENTER);
-    image(this.img, 0, 0, 10, 30);
-    pop();
-  }
-
-  offScreen() {
-    return (this.pos.x > width || this.pos.x < 0 || this.pos.y > height || this.pos.y < 0);
-  }
-}
-
-
-
-class Asteroid {
-  constructor(p, r) {
-    if (p) {
-      this.pos = p.copy();
     } else {
-      let side = floor(random(4));
-      
-      if (side === 0) { // top
-        this.pos = createVector(random(width), -r || -60);
-      } else if (side === 1) { // bot
-        this.pos = createVector(random(width), height + (r || 60));
-      } else if (side === 2) { // left
-        this.pos = createVector(-r || -60, random(height));
-      } else { // right
-        this.pos = createVector(width + (r || 60), random(height));
-      }
+        for (let asteroid of asteroids) {
+            // Check Ship 1
+            if (!ship1.isDead && ship1.hits(asteroid)) {
+                ship1.isDead = true;
+                ship1.vel.mult(1.5);
+            }
+            // Check Ship 2
+            if (!ship2.isDead && ship2.hits(asteroid)) {
+                ship2.isDead = true;
+                ship2.vel.mult(1.5);
+            }
+        }
     }
-    
-    this.r = r || 60;
-    this.vel = p5.Vector.random2D().mult(random(0.30, 1));
-    this.rotation = random(TWO_PI);
-    this.rotSpeed = random(-0.02, 0.02);
-  }
 
-  update() {
-    this.pos.add(this.vel);
-    this.rotation += this.rotSpeed;
-    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-  }
-
-  display() {
-    push();
-    translate(this.pos.x, this.pos.y);
-    rotate(this.rotation);
-    imageMode(CENTER);
-    let img = smallAsteroid;
-    if (this.r === 60) img = largeAsteroid;
-    if (this.r === 40) img = mediumAsteroid;
-    image(img, 0, 0, this.r * 2, this.r * 2);
-    pop();
-  }
+    // Game Over Only If BOTH Are Dead
+    if (ship1.isDead && ship2.isDead) {
+        if (!overState) {
+            bgm.stop();
+            if (typeof gameOverSound !== 'undefined') gameOverSound.play();
+            overState = true;
+            updateHighScore('duo', timer); 
+        }
+    }
 }
 
-class PowerupAsteroid {
-  constructor() {
-    this.pos = createVector(random(width), -30);
-    this.r = 25;
-    this.vel = p5.Vector.random2D().mult(2);
-  }
-  update() {
-    this.pos.add(this.vel);
-    if (this.pos.x > width + this.r) this.pos.x = -this.r;
-    if (this.pos.x < -this.r) this.pos.x = width + this.r;
-    if (this.pos.y > height + this.r) this.pos.y = -this.r;
-    if (this.pos.y < -this.r) this.pos.y = height + this.r;
-  }
-
-  // random shape muna kasi ala pa aq asset nagagawa
-  display() {
-    push();
-    fill(255, 215, 0);
-    noStroke();
-    circle(this.pos.x, this.pos.y, this.r * 2);
-    pop();
-  }
-}
-
-function activatePowerup() {
-  let roll = floor(random(3));
-  
-  if (roll === 0) {
-    // skill 1: invincibility 20 sec
-    shipInvincible = true;
-    shipInvincibleTime = millis();
-    currentInvincDuration = 20000; 
-  } else if (roll === 1) {
-    // skill 2L timer jump for 10sec
-    gameStartTime -= 10000; 
-  } else if (roll === 2) {
-    // skill 3: burst laser
-    multiShotActive = true;
-    multiShotEndTime = millis() + 15000;
-  }
-}
-
-// for the gameOver
 function resetDuo() {
-
-  started = false;
-  paused = false;
-
-  over = false;
-  
-  asteroids = [];
-  lasers = [];
-
-  powerups = [];
-  multiShotActive = false;
-  multiShotEndTime = 0;
-  powerupSpawnTracker = 0;
-  currentInvincDuration = 3000;
-
-  ship1 = new Ship(width / 2 - 50, height / 2, {up: 87, left: 65, right: 68, fire: 16}, lazerImg1);
-  ship2 = new Ship(width / 2 + 50, height / 2, {up: UP_ARROW, left: LEFT_ARROW, right: RIGHT_ARROW, fire: 32}, lazerImg2);
-  ship.pos = createVector(width / 2, height / 2);
-  ship.vel.set(0, 0);
-
-  // reset timer
-  timer = 0;
-  pausedTime = 0;
-  spawnAsteroids(60, 5);  // large
-  spawnAsteroids(40, 8);  // medium
-  spawnAsteroids(20, 10); // small
-  
-  lastDifficultyIncreaseTime = 0;
-  
-}
-
-// controls for solo 
-function handleDuoControls() {
-    // --- 1. START TRIGGER (Enter) ---
-    if (!started && keyCode === ENTER) {
-        started = true;
-        gameStartTime = millis();
-        pausedTime = 0;
-        return; // Exit so we don't accidentally shoot on the same frame
-    }
-
-    // --- 2. PAUSE TRIGGER (P) ---
-    if (started && !over && (keyCode === 80 || key.toLowerCase() === 'p')) {
-        paused = !paused;
-        if (paused) {
-            pauseStartTime = millis();
-        } else {
-            pausedTime += (millis() - pauseStartTime);
-        }
-    }
-
-    // --- 3. SHOOTING & POWERUPS (Shift) ---
-    // We only shoot if the game is started, NOT paused, and NOT over
-    if (started && !paused && !over) {
-        // Player 1 Shooting
-        if (keyCode === ship1.controls.fire) {
-            if (multiShotActive && millis() < multiShotEndTime) {
-                lasers.push(new Laser(ship1.pos, ship1.angle, ship1.laserImg));
-                lasers.push(new Laser(ship1.pos, ship1.angle - 0.2, ship1.laserImg));
-                lasers.push(new Laser(ship1.pos, ship1.angle + 0.2, ship1.laserImg));
-            } else {
-                lasers.push(ship1.fire());
-            }
-        }
-        // Player 2 Shooting
-        if (keyCode === ship2.controls.fire) {
-            if (multiShotActive && millis() < multiShotEndTime) {
-                lasers.push(new Laser(ship2.pos, ship2.angle, ship2.laserImg));
-                lasers.push(new Laser(ship2.pos, ship2.angle - 0.2, ship2.laserImg));
-                lasers.push(new Laser(ship2.pos, ship2.angle + 0.2, ship2.laserImg));
-            } else {
-                lasers.push(ship2.fire());
-            }
-        }
-    }
+    setupDuo(); 
+    gameStartTime = millis();
+    pausedTime = 0;
 }
