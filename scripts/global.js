@@ -457,19 +457,36 @@
 		        	textSize(20);
 		            text("W - Thrust", width / 2, height / 2 - 30);
 		            text("A / D - Rotate", width / 2, height / 2);
-		            text("SHIFT - Shoot", width / 2, height / 2 + 30);
+		            text("F - Shoot", width / 2, height / 2 + 30);
 		            pop();
 		        } 
 		        else if (pageState === "duo") {
 		            // Player 1 Column
+		            
+		            textAlign(CENTER);
+		            textFont(headers);
+		            textSize(44);
 		            push();
 			        drawingContext.shadowColor = color(orangeColor); 
 			        drawingContext.shadowBlur = 20;
 		            fill(orangeColor);
-		            textAlign(CENTER);
+		        	text("DUO ", width / 2 - 85, 111);
+		        	pop();
+		        	push();
+			        drawingContext.shadowColor = color("#52a1c8"); 
+			        drawingContext.shadowBlur = 20;
+		            fill("#52a1c8");
+		        	text("MODE", width / 2 + 85, 111);
+		        	pop();
+		        	textFont(texts);
+		        	push();
+			        drawingContext.shadowColor = color(orangeColor); 
+			        drawingContext.shadowBlur = 20;
+		            fill(orangeColor);
+		            textSize(20);
 		            text("PLAYER 1", width / 2 - 166, height / 2 - 48);
 		            text("Move: WASD Keys", width / 2 - 166, height / 2 - 18);
-		            text("Shoot: SHIFT", width / 2 - 166, height / 2 - -12);
+		            text("Shoot: F Key", width / 2 - 166, height / 2 - -12);
 		            pop();
 		            // Player 2 Column
 		            push();
@@ -477,13 +494,14 @@
 			        drawingContext.shadowBlur = 20;
 		            fill("#52a1c8");
 		            textAlign(CENTER);
+		            textSize(20);
 		            text("PLAYER 2", width / 2 + 166, height / 2 - 48);
 		            text("Move: ARROW Keys", width / 2 + 166, height / 2 - 18);
 		            text("Shoot: PERIOD(.) Key", width / 2 + 166, height / 2 - -12);
 		            pop();
 		            textAlign(CENTER);
 		        }
-
+		        textSize(20);
 		        push();
 		        drawingContext.shadowColor = color(255); 
 		        drawingContext.shadowBlur = 20;
@@ -665,8 +683,8 @@ function keyPressed() {
             // Check if the Triple-Shot powerup is active
             let isMulti = (multiShotActive && millis() < multiShotEndTime);
 
-            // Player 1: Shift
-            if (keyCode === SHIFT && !ship1.isDead) {
+            // Player 1: F
+            if (keyCode === 70 && !ship1.isDead) {
                 if (isMulti) {
                     if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
                     lasers.push(new Laser1(ship1.pos, ship1.angle));

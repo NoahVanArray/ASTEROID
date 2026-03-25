@@ -348,9 +348,10 @@ function handleSoloControls() {
         keyPressSound.play();
     }
 
+    // USE F TO SHOOT 
     // --- 3. SHOOTING & POWERUPS (Shift) ---
     // We only shoot if the game is started, NOT paused, and NOT over
-    if (started && !paused && !overState && keyCode === SHIFT) {
+    if (started && !paused && !overState && keyCode === 70) {
         // Checking for the Skill 3 (Burst Fire) Powerup
         if (multiShotActive && millis() < multiShotEndTime) {
             upgradedLaserSound.play();

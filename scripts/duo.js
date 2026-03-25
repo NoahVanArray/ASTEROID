@@ -89,20 +89,40 @@ function drawDuo() {
         textAlign(LEFT, TOP);
         noStroke();
         strokeWeight(3);
+        push();
+        drawingContext.shadowColor = color('#000000'); 
+        drawingContext.shadowBlur = 20;
         fill('#000000');
         text("Score: " + timer, 33, 33);
+        pop();
+
+        push();
+        drawingContext.shadowColor = color('#39FF14'); 
+        drawingContext.shadowBlur = 20;
         fill('#39FF14');
         textFont(headers);
         text("Score: " + timer, 30, 30);
+        pop();
 
         textSize(displayWidth / 110); 
         textAlign(RIGHT, TOP);
         noStroke();
+
+        push();
+        drawingContext.shadowColor = color(0); 
+        drawingContext.shadowBlur = 20;
         fill(0);
         text("Best: " + highScores.duo, width - 33, 33);
         textFont(headers);
+        pop();
+
+        push();
+        drawingContext.shadowColor = color(255, 200, 0); 
+        drawingContext.shadowBlur = 20;
+        textFont(headers);
         fill(255, 200, 0); 
         text("Best: " + highScores.duo, width - 30, 30);
+        pop();
 
         // --- 5. HIGH SCORE POPUP (Copied from Solo) ---
         if (hsPopupTimer > 0) {
