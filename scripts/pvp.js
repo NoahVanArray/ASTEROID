@@ -248,23 +248,35 @@ function drawWins(h1, h2){
     textFont(headers);
     
     // "WINS" Header
+    push();
+    drawingContext.shadowColor = color(255); 
+    drawingContext.shadowBlur = 20;
     fill(255);
     textSize(20);
     textAlign(CENTER, TOP);
     text("WINS", width / 2, h1);
-
+    pop();
     // Player 1 Wins (Orange)
     textSize(30);
+    push();
+    drawingContext.shadowColor = color(orangeColor); 
+    drawingContext.shadowBlur = 20;
     fill(orangeColor); 
     textAlign(RIGHT, TOP);
     text(highScores.pvpP1, width / 2 - 20, h2);
-
+    pop();
     // Dash separator
+    push();
+    drawingContext.shadowColor = color(255); 
+    drawingContext.shadowBlur = 20;
     fill(255);
     textAlign(CENTER, TOP);
     text("-", width / 2, h2);
-
+    pop();
     // Player 2 Wins (Blue)
+    push();
+    drawingContext.shadowColor = color("#52a1c8"); 
+    drawingContext.shadowBlur = 20;
     fill("#52a1c8"); 
     textAlign(LEFT, TOP);
     text(highScores.pvpP2, width / 2 + 20, h2);
@@ -290,10 +302,18 @@ function drawPvpWinnerOverlay() {
 
     textFont(texts);
     textSize(20);
+    push();
+    drawingContext.shadowColor = color(greenColor); 
+    drawingContext.shadowBlur = 20;
     fill(greenColor);
     text("rematch? (r)", width/2, height/2 + 60);
+    pop();
+    push();
+    drawingContext.shadowColor = color(redColor); 
+    drawingContext.shadowBlur = 20;
     fill(redColor);
     text("exit (esc)", width/2, height/2 + 100);
+    pop();
 }
 
 function handlePvpControls() {
