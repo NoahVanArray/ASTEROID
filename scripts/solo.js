@@ -1,22 +1,32 @@
 
 function preloadSolo() {
-  ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
-  thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
-  lazerImg = loadImage('assets/graphics/bullets/laser1.png');
-  ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
-  shipNoLife = loadImage('assets/graphics/spaceships/ship1LoseLives.png');
+    ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
+    thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
+    lazerImg = loadImage('assets/graphics/bullets/laser1.png');
+    ship1Invincibility = loadImage('assets/graphics/spaceships/shipInvincibility.png');
+    shipNoLife = loadImage('assets/graphics/spaceships/ship1LoseLives.png');
 
   largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
   mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
   smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
   specialPowerAsteroid1 = loadImage("assets/graphics/asteroids/specialPower 1.png");
   specialPowerAsteroid2 = loadImage("assets/graphics/asteroids/specialPower 2.png");
+    largeAsteroid = loadImage("assets/graphics/asteroids/large.png");
+    mediumAsteroid = loadImage("assets/graphics/asteroids/medium.png");
+    smallAsteroid = loadImage("assets/graphics/asteroids/small.png");
+
+    powerupAsteroidImg = loadImage("assets/graphics/asteroids/specialPower_2-NoBGpng.png");
+
+    alienImg = loadImage("assets/graphics/spaceships/alien3.png"); 
+    alienLaserImg = loadImage("assets/graphics/bullets/laser3.png");
 }
 
 function setupSolo() {
   
   // ship default spawn
   ship = new Ship1(width/2, height/2, { up: 87, left: 65, right: 68 });
+  aliens = []; 
+  alienLasers = [];
   
   // asteroid default spawn
   spawnAsteroids(60, 5);  // large
@@ -69,24 +79,34 @@ function drawSolo() {
         textAlign(LEFT, TOP);
         noStroke();
         strokeWeight(3);
+        push();
+        drawingContext.shadowColor = color('#000000'); 
+        drawingContext.shadowBlur = 20;
         fill('#000000');
-        text("Score: " + timer, 33, 33);
+        text("TIME " + timer, 33, 33);
+        pop();
+        push();
+        drawingContext.shadowColor = color('#39FF14'); 
+        drawingContext.shadowBlur = 20;
         fill('#39FF14');
         textFont(headers);
-        text("Score: " + timer, 30, 30);
-
+        text("TIME: " + timer, 30, 30);
+        pop();
         textSize(displayWidth / 110); // Keeping your same scale
         textAlign(RIGHT, TOP);
         noStroke();
 
         // 1. Shadow/Offset for readability (Black)
+        push();
+        drawingContext.shadowColor = color('#000000'); 
+        drawingContext.shadowBlur = 20;
         fill(0);
-        text("Best: " + highScores.solo, width - 33, 33);
-
+        text("BEST: " + highScores.solo, width - 33, 33);
+        pop();
         // 2. Main Text (Neon Gold/Yellow looks great for a record)
         textFont(headers);
         fill(255, 200, 0); 
-        text("Best: " + highScores.solo, width - 30, 30);
+        text("BEST: " + highScores.solo, width - 30, 30);
 
         if (hsPopupTimer > 0) {
           push();
@@ -127,6 +147,43 @@ function drawSolo() {
 
     }
 
+    // 1. Randomly spawn an alien (e.g., 0.5% chance per frame)
+    if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
+        aliens.push(new Alien());
+    }
+
+    // 2. Update and Draw Aliens
+    for (let i = aliens.length - 1; i >= 0; i--) {
+        aliens[i].update([ship]); // Pass the single ship as target
+        aliens[i].display();
+
+        // Check if player's lasers hit the alien
+        for (let j = lasers.length - 1; j >= 0; j--) {
+            if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
+                aliens.splice(i, 1);
+                lasers.splice(j, 1);
+                // play explosion sound here
+                break;
+            }
+        }
+    }
+
+    // 3. Update Alien Lasers
+    for (let i = alienLasers.length - 1; i >= 0; i--) {
+        alienLasers[i].update();
+        alienLasers[i].display();
+
+        // Check if Alien laser hits player
+        if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < ship.r) {
+            ship.lives -= 1; // Or trigger your death logic
+            alienLasers.splice(i, 1);
+            continue;
+        }
+
+        if (alienLasers[i].offscreen()) {
+            alienLasers.splice(i, 1);
+        }
+    }
 }
 
 function updateAllSolo() {
@@ -338,9 +395,10 @@ function handleSoloControls() {
         keyPressSound.play();
     }
 
+    // USE F TO SHOOT 
     // --- 3. SHOOTING & POWERUPS (Shift) ---
     // We only shoot if the game is started, NOT paused, and NOT over
-    if (started && !paused && !overState && keyCode === SHIFT) {
+    if (started && !paused && !overState && keyCode === 70) {
         // Checking for the Skill 3 (Burst Fire) Powerup
         if (multiShotActive && millis() < multiShotEndTime) {
             upgradedLaserSound.play();
