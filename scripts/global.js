@@ -654,14 +654,6 @@
 function keyPressed() {
     // title page
     if (pageState === "title") {
-// <<<<<<< HEAD
-//         if (keyCode === ENTER) pageState = "gameMode";
-//         if (keyCode === 82) stage = 2; // 'R' for Reset
-//         if (keyCode === 89 && stage === 2) { // 'Y' for Yes
-//             // resetAllHighScores();
-//             resetHighScore = 120;
-//             stage = 1;
-// =======
         if (keyCode === ENTER) {
             gameStartSound.play(); // Moved inside here!
             pageState = "gameMode";
@@ -712,11 +704,17 @@ function keyPressed() {
     else if (pageState === "solo") {
         if (keyCode === ESCAPE  && (paused === true || overState || !started ) ) {
         	keyPressSound.play();
+			if (bgm && !bgm.isPlaying()) {
+				bgm.loop();
+			}
             pageState = "gameMode";
             overState = false;
         }
         if (keyCode === 82 && overState) {
-            resetSolo(); // 'R' to restart
+            resetSolo();
+			if (bgm && !bgm.isPlaying()) {
+				bgm.loop();
+			}
         }
 
         handleSoloControls();
@@ -785,12 +783,18 @@ function keyPressed() {
         // reset
         if (keyCode === 82 && overState) {
             resetDuo();
+			if (bgm && !bgm.isPlaying()) {
+				bgm.loop();
+			}
         }
     }
 
     else if (pageState === "pvp") {
 		if (keyCode === ESCAPE && (!pvpStarted || pvpOver || pvpPaused)) {
             keyPressSound.play();
+			if (bgm && !bgm.isPlaying()) {
+				bgm.loop();
+			}
             pageState = "gameMode";
             return;
         }

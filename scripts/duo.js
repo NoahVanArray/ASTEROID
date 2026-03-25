@@ -1,7 +1,4 @@
 
-// duo.js
-let ship1, ship2;
-
 function preloadDuo() {
     ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
     thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
