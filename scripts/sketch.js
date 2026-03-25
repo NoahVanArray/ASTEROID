@@ -75,8 +75,8 @@ function setup() {
     setupPvp();
     
     cnv = createCanvas(800, 600);
-    cnv.style('display', 'block'); // Helps prevent weird scrollbar issues
-    centerCanvas(); // Call it once at the start
+    cnv.style('display', 'block');
+    centerCanvas();
 
     for (let i = 0; i < 100; i++){
         stars.push( new Star() );

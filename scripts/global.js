@@ -174,6 +174,9 @@
 		    rotate(this.angle + HALF_PI);
 		    imageMode(CENTER);
 
+			drawingContext.shadowBlur = 20;
+			drawingContext.shadowColor = (this instanceof Ship1) ? orangeColor : color("#52a1c8");
+
 		    if (this.isDead) {
 		        tint(255, 100); // Ghostly drift
 		    }
@@ -267,6 +270,9 @@
 		    rotate(this.angle + HALF_PI);
 		    imageMode(CENTER);
 
+			drawingContext.shadowBlur = 20;
+			drawingContext.shadowColor = (this instanceof Ship1) ? orangeColor : color("#52a1c8");
+
 		    if (this.isDead) {
 		        tint(255, 100); // Ghostly drift
 		    }
@@ -299,7 +305,8 @@
 	  }
 	  update() { this.pos.add(this.vel); }
 	  display() {
-	    push();
+	    push();drawingContext.shadowBlur = 15;
+    	drawingContext.shadowColor = orangeColor;
 	    translate(this.pos.x, this.pos.y);
 	    rotate(this.angle + HALF_PI);
 	    imageMode(CENTER);
@@ -327,7 +334,8 @@
 	 	}
 	 	update() { this.pos.add(this.vel); }
 	 	display() {
-	 		push();
+	 		push();drawingContext.shadowBlur = 15;
+    		drawingContext.shadowColor = orangeColor;
 	 		translate(this.pos.x, this.pos.y);
 	 		rotate(this.angle + HALF_PI);
 	 		imageMode(CENTER);
@@ -385,6 +393,8 @@
 	    translate(this.pos.x, this.pos.y);
 	    rotate(this.rotation);
 	    imageMode(CENTER);
+		drawingContext.shadowBlur = 15;
+    	drawingContext.shadowColor = color(200);
 	    let img = smallAsteroid;
 	    if (this.r === 60) img = largeAsteroid;
 	    if (this.r === 40) img = mediumAsteroid;
