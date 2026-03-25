@@ -85,7 +85,7 @@ function drawPvp() {
     }
 
     if (!pvpStarted) {
-        drawOverlay("PVP MODE", "P1: WASD + SHIFT | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
+        drawOverlay("PVP MODE", "P1: WASD + F | P2: ARROWS + DOT (.)\n\n[3 LIVES EACH]\n\nPress ENTER to Start", false);
     } else if (pvpOver) {
         drawPvpWinnerOverlay();
     } else if (pvpPaused) {
@@ -286,16 +286,33 @@ function drawPvpWinnerOverlay() {
 }
 
 function handlePvpControls() {
-    if (!pvpStarted && keyCode === ENTER) {
-        pvpStarted = true;
+    if (!pvpStarted) {
+        
+        if (keyCode === ENTER) {
+            pvpStarted = true;
+            keyPressSound.play();
+        }
+
+        if (keyCode === ESCAPE) {
+            pageState = "gameMode";
+            keyPressSound.play();
+        }
     }
 
     if (pvpStarted && !pvpOver && (keyCode === 80 || key.toLowerCase() === 'p')) {
         pvpPaused = !pvpPaused;
+        keyPressSound.play();
+    }
+
+    if (pvpStarted && pvpPaused === true) {
+        if (keyCode === ESCAPE) {
+            pageState = "gameMode";
+            keyPressSound.play();
+        }
     }
 
     if (pvpStarted && !pvpPaused && !pvpOver) {
-        if (keyCode === SHIFT) {
+        if (keyCode === 70) { // F KEY
             lasers.push(new Laser1(ship1.pos, ship1.angle));
             if (typeof laserSound !== 'undefined') laserSound.play();
         }

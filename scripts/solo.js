@@ -1,4 +1,3 @@
-
 function preloadSolo() {
     ship1Img = loadImage('assets/graphics/spaceships/ship1.png');
     thrust1Img = loadImage('assets/graphics/spaceships/thrust1.png');
@@ -14,6 +13,7 @@ function preloadSolo() {
 
     alienImg = loadImage("assets/graphics/spaceships/alien3.png"); 
     alienLaserImg = loadImage("assets/graphics/bullets/laser3.png");
+    lastAlienSpawnTime = millis();
 }
 
 function setupSolo() {
@@ -35,17 +35,15 @@ function drawSolo() {
         displayAllSolo(); 
     } 
     else if (!started) {
-        // --- READY SCREEN ---
-        displayAllSolo(); // Show ship/asteroids frozen in place
+        displayAllSolo(); 
         drawOverlay("HOW TO PLAY", "Press ENTER to Begin", true);
-
     } 
     else if (paused) {
-        // --- PAUSE SCREEN ---
         displayAllSolo(); 
         drawOverlay("PAUSED", "Press P to Resume", true);
     } 
     else {
+        // --- GAME IS RUNNING ---
         let currentSessionTime = millis() - gameStartTime - pausedTime;
         timer = floor(currentSessionTime / 1000);
 
@@ -57,18 +55,62 @@ function drawSolo() {
         }
 
         if (timer > highScores.solo && !hsAnnounced && timer > 0) {
-          // 1. Save it to local storage permanently!
           updateHighScore('solo', timer); 
-          
-          // 2. Trigger the visuals
           hsAnnounced = true;
           hsPopupTimer = 180;
-          newHighScoreSound.play();
+          if (typeof newHighScoreSound !== 'undefined') newHighScoreSound.play();
         }
 
         updateAllSolo();
         displayAllSolo();
 
+        // ===== FIX #1: Only spawn if no aliens exist, and reset timer after death =====
+        if (aliens.length === 0 && millis() - lastAlienSpawnTime > ALIEN_SPAWN_INTERVAL) {
+            aliens.push(new Alien());
+            lastAlienSpawnTime = millis(); // Reset the timer after spawn
+        }
+
+        // 2. Update and Draw Aliens
+        for (let i = aliens.length - 1; i >= 0; i--) {
+            // Remove alien after 2 second flash
+            if (aliens[i].hitTime !== null && millis() - aliens[i].hitTime > 800) {
+                aliens.splice(i, 1);
+                continue;
+            }
+
+            aliens[i].update([ship]); 
+            aliens[i].display();
+
+            if (aliens[i].hitTime === null) { // Only check laser hits if not already hit
+                for (let j = lasers.length - 1; j >= 0; j--) {
+                    if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
+                        aliens[i].hitTime = millis();
+                        lasers.splice(j, 1);
+                        if (typeof asteroidSound !== 'undefined') asteroidSound.play();
+                        break;
+                    }
+                }
+            }
+        }
+        // 3. Update Alien Lasers & Check Player Hit
+        for (let i = alienLasers.length - 1; i >= 0; i--) {
+            alienLasers[i].update();
+            alienLasers[i].display();
+
+            // FIXED: Used ship.size / 2 for the hitbox
+            if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < (ship.size / 2) + alienLasers[i].r) {
+                if (typeof gameOverSound !== 'undefined') gameOverSound.play();
+                overState = true; 
+                alienLasers.splice(i, 1);
+                continue;
+            }
+
+            if (alienLasers[i].offscreen()) {
+                alienLasers.splice(i, 1);
+            }
+        }
+
+        // UI Drawing
         textSize(displayWidth / 110);
         textAlign(LEFT, TOP);
         noStroke();
@@ -79,6 +121,7 @@ function drawSolo() {
         fill('#000000');
         text("Score: " + timer, 33, 33);
         pop();
+        
         push();
         drawingContext.shadowColor = color('#39FF14'); 
         drawingContext.shadowBlur = 20;
@@ -86,96 +129,44 @@ function drawSolo() {
         textFont(headers);
         text("Score: " + timer, 30, 30);
         pop();
-        textSize(displayWidth / 110); // Keeping your same scale
+        
+        textSize(displayWidth / 110); 
         textAlign(RIGHT, TOP);
         noStroke();
 
-        // 1. Shadow/Offset for readability (Black)
         push();
         drawingContext.shadowColor = color('#000000'); 
         drawingContext.shadowBlur = 20;
         fill(0);
         text("Best: " + highScores.solo, width - 33, 33);
         pop();
-        // 2. Main Text (Neon Gold/Yellow looks great for a record)
+        
         textFont(headers);
         fill(255, 200, 0); 
         text("Best: " + highScores.solo, width - 30, 30);
 
         if (hsPopupTimer > 0) {
           push();
-          // 1. Make it blink using the timer
-          // If the timer is even, show it; if odd, hide it (rapid blink)
           if (floor(hsPopupTimer / 10) % 2 === 0) { 
-              
-            // 2. Add that Neon Glow
-            drawingContext.shadowColor = color(57, 255, 20); // Neon Green
+            drawingContext.shadowColor = color(57, 255, 20);
             drawingContext.shadowBlur = 20;
-            
             fill(57, 255, 20);
             textSize(32);
             textAlign(CENTER);
             textFont(headers);
-            
-            // Position it just above the player or at the top center
             text("NEW HIGH SCORE!", width / 2, 100);
-            
-            // 3. Update the high score in real-time on the UI
-            // This ensures the "High Score" number at the top matches your current score immediately
             highScores.solo = timer; 
           }
-          
-          hsPopupTimer--; // Count down until it disappears
+          hsPopupTimer--;
           pop();
         }
 
         if (plusTenTimer > 0) {
             textSize(displayWidth / 110);
             textFont(headers);
-            fill(255, 200, 0, plusTenTimer * 8); // Multiplier depends on how fast you want it to fade
+            fill(255, 200, 0, plusTenTimer * 8); 
             text('+10!', 180, 50);
-            
             plusTenTimer--;
-            
-        }
-
-    }
-
-    // 1. Randomly spawn an alien (e.g., 0.5% chance per frame)
-    if (started && !paused && !overState && random(1) < 0.005 && aliens.length < 1) {
-        aliens.push(new Alien());
-    }
-
-    // 2. Update and Draw Aliens
-    for (let i = aliens.length - 1; i >= 0; i--) {
-        aliens[i].update([ship]); // Pass the single ship as target
-        aliens[i].display();
-
-        // Check if player's lasers hit the alien
-        for (let j = lasers.length - 1; j >= 0; j--) {
-            if (dist(lasers[j].pos.x, lasers[j].pos.y, aliens[i].pos.x, aliens[i].pos.y) < aliens[i].r) {
-                aliens.splice(i, 1);
-                lasers.splice(j, 1);
-                // play explosion sound here
-                break;
-            }
-        }
-    }
-
-    // 3. Update Alien Lasers
-    for (let i = alienLasers.length - 1; i >= 0; i--) {
-        alienLasers[i].update();
-        alienLasers[i].display();
-
-        // Check if Alien laser hits player
-        if (!shipInvincible && dist(alienLasers[i].pos.x, alienLasers[i].pos.y, ship.pos.x, ship.pos.y) < ship.r) {
-            ship.lives -= 1; // Or trigger your death logic
-            alienLasers.splice(i, 1);
-            continue;
-        }
-
-        if (alienLasers[i].offscreen()) {
-            alienLasers.splice(i, 1);
         }
     }
 }
@@ -216,6 +207,8 @@ function displayAllSolo() {
     for (let l of lasers) l.display();
     for (let a of asteroids) a.display();
     for (let p of powerups) p.display();
+    for (let al of aliens) al.display();
+    for (let al of alienLasers) al.display();
 }
 
 function handleCollisions() {
@@ -250,14 +243,14 @@ function handleCollisions() {
 
 
 function checkShipAsteroidCollision() {
-	updateHighScore('solo', timer);
+    updateHighScore('solo', timer);
 
   if (shipInvincible) {
-  	if (millis() - shipInvincibleTime > currentInvincDuration) {
-    	shipInvincible = false;
+    if (millis() - shipInvincibleTime > currentInvincDuration) {
+        shipInvincible = false;
       currentInvincDuration = 3000;
-  	}
-  	return;
+    }
+    return;
   }
 
   for (let asteroid of asteroids) {
@@ -297,12 +290,6 @@ function checkLargeAsteroidRespawn() {
   }
 }
 
-
-
-
-
-
-
 function activatePowerup() {
   let roll = floor(random(3));
   
@@ -339,6 +326,8 @@ function resetSolo() {
   
   asteroids = [];
   lasers = [];
+  aliens = []; // ===== FIX: Clear aliens array =====
+  alienLasers = []; // ===== FIX: Clear alien lasers array =====
 
   powerups = [];
   multiShotActive = false;
@@ -363,6 +352,7 @@ function resetSolo() {
   spawnAsteroids(20, 10); // small
   
   lastDifficultyIncreaseTime = 0;
+  lastAlienSpawnTime = millis(); // ===== FIX: Reset alien spawn timer =====
   
   hsAnnounced = false; 
   hsPopupTimer = 0;
