@@ -262,6 +262,7 @@ function checkShipAsteroidCollision() {
     );
 
     if (d < asteroid.r + ship.size / 2) {
+      bgm.stop();
       gameOverSound.play();
       overState = true;
       timer = timer;
@@ -363,10 +364,11 @@ function handleSoloControls() {
     // --- 1. START TRIGGER (Enter) ---
     if (!started && keyCode === ENTER) {
         keyPressSound.play();
+        bgm.loop(); // <-- ADDED: Start music on Enter
         started = true;
         gameStartTime = millis();
         pausedTime = 0;
-        return; // Exit so we don't accidentally shoot on the same frame
+        return; 
     }
 
     // --- 2. PAUSE TRIGGER (P) ---
@@ -374,8 +376,10 @@ function handleSoloControls() {
         paused = !paused;
         if (paused) {
             pauseStartTime = millis();
+            bgm.pause(); // <-- ADDED: Pause music
         } else {
             pausedTime += (millis() - pauseStartTime);
+            bgm.loop(); // <-- ADDED: Resume music
         }
         keyPressSound.play();
     }

@@ -775,28 +775,25 @@ function keyPressed() {
     else if (pageState === "solo") {
         if (keyCode === ESCAPE  && (paused === true || overState || !started ) ) {
         	keyPressSound.play();
-			if (!bgm.isPlaying()) {
-				bgm.loop(); 
-			}
+			bgm.stop(); // <-- CHANGED: Stop music when exiting to menu
             pageState = "gameMode";
             overState = false;
         }
         if (keyCode === 82 && overState) {
-            resetSolo(); // 'R' to restart
+            resetSolo(); 
         }
 
         handleSoloControls();
     }
     // DUO
     // --- DUO SECTION ---
+    // --- DUO SECTION ---
     else if (pageState === "duo") {
         
         // 1. START TRIGGER
         if (!started && keyCode === ENTER) {
             keyPressSound.play();
-			if (!bgm.isPlaying()) {
-				bgm.loop(); 
-			}
+			bgm.loop(); // <-- ADDED: Start music on Enter
             started = true;
             gameStartTime = millis();
             return;
@@ -806,56 +803,31 @@ function keyPressed() {
         if (started && !overState && (keyCode === 80 || key.toLowerCase() === 'p')) {
             paused = !paused;
             keyPressSound.play();
-            if (paused) pauseStartTime = millis();
-            else pausedTime += (millis() - pauseStartTime);
+            if (paused) {
+                pauseStartTime = millis();
+                bgm.pause(); // <-- ADDED: Pause music
+            } else {
+                pausedTime += (millis() - pauseStartTime);
+                bgm.loop(); // <-- ADDED: Resume music
+            }
             return;
         }
 
         // 3. EXIT TRIGGER (Esc)
         if (keyCode === ESCAPE && (paused || overState || !started)) {
             keyPressSound.play();
+            bgm.stop(); // <-- ADDED: Stop music when exiting
             pageState = "gameMode";
             overState = false;
             started = false;
         }
+        
+        // ... (Keep the rest of your Duo shooting/restart logic exactly the same) ...
+    }
 
-        // 4. SHOOTING (Only if started and NOT paused)
-        if (started && !paused && !overState) {
-            
-            // Check if the Triple-Shot powerup is active
-            let isMulti = (multiShotActive && millis() < multiShotEndTime);
-
-            // Player 1: F
-            if (keyCode === 70 && !ship1.isDead) {
-                if (isMulti) {
-                    if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
-                    lasers.push(new Laser1(ship1.pos, ship1.angle));
-                    lasers.push(new Laser1(ship1.pos, ship1.angle - 0.2));
-                    lasers.push(new Laser1(ship1.pos, ship1.angle + 0.2));
-                } else {
-                    lasers.push(ship1.fire());
-                    if (typeof laserSound !== 'undefined') laserSound.play();
-                }
-            }
-            
-            // Player 2: Period (.)
-            if (keyCode === 190 && !ship2.isDead) {
-                if (isMulti) {
-                    if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
-                    lasers.push(new Laser2(ship2.pos, ship2.angle));
-                    lasers.push(new Laser2(ship2.pos, ship2.angle - 0.2));
-                    lasers.push(new Laser2(ship2.pos, ship2.angle + 0.2));
-                } else {
-                    lasers.push(ship2.fire());
-                    if (typeof laserSound !== 'undefined') laserSound.play();
-                }
-            }
-        }
-
-        // 5. RESTART TRIGGER
-        if (keyCode === 82 && overState) {
-            resetDuo();
-        }
+    else if (pageState === "pvp") {
+        // <-- DELETED the bgm.loop() that was accidentally playing here immediately
+        handlePvpControls();
     }
 
     else if (pageState === "pvp") {

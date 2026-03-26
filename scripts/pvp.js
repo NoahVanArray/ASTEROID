@@ -219,12 +219,14 @@ function checkPvpVictory() {
             winner = "PLAYER 2";
             addPvpWin(2); // Give P2 a point
             pvpOver = true;
+            bgm.stop();
             if (typeof pvpVictory !== 'undefined') pvpVictory.play();
         } else if (ship2.lives <= 0) {
             ship2.lives = 0;
             winner = "PLAYER 1";
             addPvpWin(1); // Give P1 a point
             pvpOver = true;
+            bgm.stop();
             if (typeof pvpVictory !== 'undefined') pvpVictory.play();
         }
     }
@@ -318,27 +320,34 @@ function drawPvpWinnerOverlay() {
 
 function handlePvpControls() {
     if (!pvpStarted) {
-        
         if (keyCode === ENTER) {
             pvpStarted = true;
             keyPressSound.play();
+            bgm.loop(); // <-- ADDED: Start music on Enter
         }
 
         if (keyCode === ESCAPE) {
             pageState = "gameMode";
             keyPressSound.play();
+            bgm.stop(); // <-- ADDED: Stop music on Exit
         }
     }
 
     if (pvpStarted && !pvpOver && (keyCode === 80 || key.toLowerCase() === 'p')) {
         pvpPaused = !pvpPaused;
         keyPressSound.play();
+        if (pvpPaused) {
+            bgm.pause(); // <-- ADDED: Pause music
+        } else {
+            bgm.loop(); // <-- ADDED: Resume music
+        }
     }
 
     if (pvpStarted && pvpPaused === true) {
         if (keyCode === ESCAPE) {
             pageState = "gameMode";
             keyPressSound.play();
+            bgm.stop(); // <-- ADDED: Stop music on Exit
         }
     }
 
@@ -355,6 +364,9 @@ function handlePvpControls() {
 
     if (pvpOver) {
         if (key.toLowerCase() === 'r') resetPvp();
-        if (keyCode === ESCAPE) pageState = "gameMode"; 
+        if (keyCode === ESCAPE) {
+            pageState = "gameMode"; 
+            bgm.stop(); // <-- ADDED: Stop music on Exit
+        }
     }
 }

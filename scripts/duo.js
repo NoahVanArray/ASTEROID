@@ -302,6 +302,7 @@ function handleDuoCollisions() {
     // Game Over Only If BOTH Are Dead
     if (ship1.isDead && ship2.isDead) {
         if (!overState) {
+            bgm.stop();
             if (typeof gameOverSound !== 'undefined') gameOverSound.play();
             overState = true;
             updateHighScore('duo', timer); 
