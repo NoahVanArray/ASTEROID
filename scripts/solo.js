@@ -384,8 +384,7 @@ function handleSoloControls() {
         keyPressSound.play();
     }
 
-    // USE F TO SHOOT 
-    // --- 3. SHOOTING & POWERUPS (Shift) ---
+    // --- 3. SHOOTING & POWERUPS (F) ---
     // We only shoot if the game is started, NOT paused, and NOT over
     if (started && !paused && !overState && keyCode === 70) {
         // Checking for the Skill 3 (Burst Fire) Powerup
