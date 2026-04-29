@@ -828,8 +828,8 @@ function keyPressed() {
             // Check if the Triple-Shot powerup is active
             let isMulti = (multiShotActive && millis() < multiShotEndTime);
 
-            // Player 1: Shift
-            if (keyCode === SHIFT && !ship1.isDead) {
+            // Player 1: F
+            if (keyCode === 70 && !ship1.isDead) {
             	if (isMulti) {
                     if (typeof upgradedLaserSound !== 'undefined') upgradedLaserSound.play();
                     lasers.push(new Laser1(ship1.pos, ship1.angle));
